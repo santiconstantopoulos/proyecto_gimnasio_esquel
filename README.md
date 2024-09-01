@@ -1,4 +1,4 @@
-# proyecto_gimnasio_esquel
+# proyecto_gimnacio_esquel
 
 A new Flutter project.
 

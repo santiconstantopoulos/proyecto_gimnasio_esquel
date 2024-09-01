@@ -8,6 +8,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1092870181448:android:58db1b59b34ec7acb0be7d",
+        "android_client_info": {
+          "package_name": "com.example.proyecto_gimnacio_esquel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxKdqdm6xBsbNPipB1pwa8FCKgvbp5dAw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1092870181448:android:42d2ad7f689e586eb0be7d",
         "android_client_info": {
           "package_name": "com.example.proyecto_gimnasio_esquel"
