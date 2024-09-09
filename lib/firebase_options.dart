@@ -26,10 +26,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -60,4 +57,17 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://proyecto-esquel-gimnasio-default-rtdb.firebaseio.com',
     storageBucket: 'proyecto-esquel-gimnasio.appspot.com',
   );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDafBPhcMeGX2FhU_2PVfVFSoCi4XZWZtE',
+    appId: '1:1092870181448:ios:d0086790546436cdb0be7d',
+    messagingSenderId: '1092870181448',
+    projectId: 'proyecto-esquel-gimnasio',
+    databaseURL: 'https://proyecto-esquel-gimnasio-default-rtdb.firebaseio.com',
+    storageBucket: 'proyecto-esquel-gimnasio.appspot.com',
+    androidClientId: '1092870181448-u2cv8uca9m7sjbtl3o9df2jqhhcv61tc.apps.googleusercontent.com',
+    iosClientId: '1092870181448-chdps3n2kp4sgdkap57c891m9q51jku5.apps.googleusercontent.com',
+    iosBundleId: 'com.example.proyectoGimnacioEsquel',
+  );
+
 }

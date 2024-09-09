@@ -13,7 +13,20 @@
           "package_name": "com.example.proyecto_gimnacio_esquel"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1092870181448-u2cv8uca9m7sjbtl3o9df2jqhhcv61tc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.proyecto_gimnacio_esquel",
+            "certificate_hash": "6b436a34b0d1c7e7684ccce48ee9615514145c2a"
+          }
+        },
+        {
+          "client_id": "1092870181448-enq21pikqoqk2ipndi45fqkejtj51he2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCxKdqdm6xBsbNPipB1pwa8FCKgvbp5dAw"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092870181448-enq21pikqoqk2ipndi45fqkejtj51he2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1092870181448-chdps3n2kp4sgdkap57c891m9q51jku5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.proyectoGimnacioEsquel"
+              }
+            }
+          ]
         }
       }
     },
@@ -32,7 +57,12 @@
           "package_name": "com.example.proyecto_gimnasio_esquel"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1092870181448-enq21pikqoqk2ipndi45fqkejtj51he2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCxKdqdm6xBsbNPipB1pwa8FCKgvbp5dAw"
@@ -40,7 +70,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092870181448-enq21pikqoqk2ipndi45fqkejtj51he2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1092870181448-chdps3n2kp4sgdkap57c891m9q51jku5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.proyectoGimnacioEsquel"
+              }
+            }
+          ]
         }
       }
     }
