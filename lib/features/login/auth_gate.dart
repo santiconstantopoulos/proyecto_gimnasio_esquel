@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
-
 
 import '../home/home.dart';
 
@@ -48,22 +48,27 @@ class AuthGate extends StatelessWidget {
             return SignInScreen(
               providers: [
                 EmailAuthProvider(),
+                GoogleProvider(
+                    clientId:
+                        "1092870181448-enq21pikqoqk2ipndi45fqkejtj51he2.apps.googleusercontent.com"),
               ],
-              headerBuilder: (context, constraints, shrinkOffset) {
-                return Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Image.asset('assets/image.png'),
-                  ),
-                );
-              },
+              // headerBuilder: (context, constraints, shrinkOffset) {
+              //   return Padding(
+              //     padding: const EdgeInsets.all(20),
+              //     child: AspectRatio(
+              //       aspectRatio: 1,
+              //       child: Image.asset('assets/image.png'),
+              //     ),
+              //   );
+              // },
               subtitleBuilder: (context, action) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: action == AuthAction.signIn
-                      ? const Text('Bienvenido a Gym App, por favor inicie sesión!')
-                      : const Text('Bienvenido a Gym App, por favor registrese!'),
+                      ? const Text(
+                          'Bienvenido a Gym App, por favor inicie sesión!')
+                      : const Text(
+                          'Bienvenido a Gym App, por favor registrese!'),
                 );
               },
               footerBuilder: (context, action) {
