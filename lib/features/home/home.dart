@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart'; // Importa la pantalla de perfil
+import 'package:proyecto_gimnasio_esquel/features/dark_mode_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart'; // Nueva pantalla para reservas
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,17 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     // Contenido de la pantalla inicial
-    Center(
-      child: Column(
-        children: [
-          Image.asset('dash.png'), // Reemplaza con tu imagen
-          const Text(
-            'Welcome!'
-          ),
-          // Agrega más widgets para la pantalla inicial
-        ],
-      ),
-    ),
+    ReservationsScreen(), // Nueva pantalla de reservas
     // Contenido de la pantalla de notificaciones
     const Center(child: Text('Notificaciones')),
     // Contenido de la pantalla del menú lateral
@@ -34,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Mercado Pago'),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -41,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(), // Navega a la pantalla de perfil
+                  builder: (context) => const ProfileScreen(), 
                 ),
               );
             },
@@ -110,14 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.shopping_bag),
-              title: const Text('Mis compras'),
-              onTap: () {
-                // Lógica para navegar a Mis compras
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.favorite),
               title: const Text('Favoritos'),
               onTap: () {
@@ -134,10 +119,13 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.star),
-              title: const Text('Cupones'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Opciones'),
               onTap: () {
-                // Lógica para navegar a Cupones
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DarkModeScreen()),
+                );
                 Navigator.pop(context);
               },
             ),
