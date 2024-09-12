@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.pop(context);
                 setState(() {
-                  _selectedIndex = 1; // Selecciona Notificaciones
+                  _selectedIndex = 1; 
                 });
               },
             ),
@@ -106,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.favorite),
               title: const Text('Favoritos'),
               onTap: () {
-                // Lógica para navegar a Favoritos
                 Navigator.pop(context);
               },
             ),
@@ -114,7 +113,6 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.local_offer),
               title: const Text('Ofertas'),
               onTap: () {
-                // Lógica para navegar a Ofertas
                 Navigator.pop(context);
               },
             ),
