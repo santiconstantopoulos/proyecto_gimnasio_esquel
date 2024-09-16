@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/features/dark_mode_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart'; // Nueva pantalla para reservas
+import '../dark_mode_screen.dart';
+import '../profile/profile_screen.dart';
+import '../reservations/reservations_screen.dart'; // Nueva pantalla para reservas
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(), 
+                  builder: (context) => const ProfileScreen(),
                 ),
               );
             },
@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.pop(context);
                 setState(() {
-                  _selectedIndex = 1; 
+                  _selectedIndex = 1;
                 });
               },
             ),
@@ -122,7 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DarkModeScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const DarkModeScreen()),
                 );
                 Navigator.pop(context);
               },

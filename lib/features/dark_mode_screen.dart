@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DarkModeScreen extends StatefulWidget {
-  const DarkModeScreen({Key? key}) : super(key: key);
+  const DarkModeScreen({super.key});
 
   @override
   State<DarkModeScreen> createState() => _DarkModeScreenState();

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
-const ProfileScreen({Key? key}) : super(key: key);
-
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +16,8 @@ const ProfileScreen({Key? key}) : super(key: key);
             // Agrega la imagen de perfil
             const CircleAvatar(
               radius: 50,
-              backgroundImage: NetworkImage('https://picsum.photos/200'), // Reemplaza con la URL de la imagen del perfil
+              backgroundImage: NetworkImage(
+                  'https://picsum.photos/200'), // Reemplaza con la URL de la imagen del perfil
             ),
             const SizedBox(height: 20),
             // Agrega el nombre del usuario
