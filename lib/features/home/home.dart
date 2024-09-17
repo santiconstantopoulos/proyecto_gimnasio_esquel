@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     // Contenido de la pantalla inicial
-    const ReservationsScreen(), // pPantalla de reservas
+    const ReservationsScreen(), // Pantalla de reservas
     // Contenido de la pantalla de notificaciones
     const Center(child: Text('Notificaciones')),
     // Contenido de la pantalla del menú lateral
