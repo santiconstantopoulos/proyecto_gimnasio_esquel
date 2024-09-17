@@ -33,4 +33,19 @@ class ReservationsService {
       throw Exception('Error al guardar la reserva: $e');
     }
   }
+
+  Future<void> updateReservation(DateTime dateTime) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_authService.userId)
+          .collection('reservations')
+          .add({
+        'date': Timestamp.fromDate(dateTime),
+        'status': 1,
+      });
+    } catch (e) {
+      throw Exception('Error al guardar la reserva: $e');
+    }
+  }
 }

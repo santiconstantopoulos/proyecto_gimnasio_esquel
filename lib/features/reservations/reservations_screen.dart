@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
@@ -53,7 +55,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
           picked.hour,
           picked.minute,
         );
-        _timeController.text = '${picked.format(context)}';
+        _timeController.text = picked.format(context);
       });
     }
   }
@@ -62,7 +64,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       if (_selectedDateTime == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fecha y hora no seleccionadas')),
+          const SnackBar(content: Text('Fecha y hora no seleccionadas')),
         );
         return;
       }
@@ -70,7 +72,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
       try {
         await _reservationsService.saveReservation(_selectedDateTime!);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Reserva guardada exitosamente')),
+          const SnackBar(content: Text('Reserva guardada exitosamente')),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -138,8 +140,8 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
               },
             ),
             ElevatedButton(
-              child: const Text('Guardar'),
               onPressed: _saveReservation,
+              child: const Text('Guardar'),
             ),
           ],
         );
