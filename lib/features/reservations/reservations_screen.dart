@@ -21,6 +21,13 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
   final _timeController = TextEditingController();
   DateTime? _selectedDateTime;
 
+  @override
+  void dispose() {
+    _dateController.dispose();
+    _timeController.dispose();
+    super.dispose();
+  }
+
   void _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -37,7 +44,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
           _selectedDateTime?.hour ?? 0,
           _selectedDateTime?.minute ?? 0,
         );
-        _dateController.text = '${picked.toLocal()}'.split(' ')[0];
+        _dateController.text = DateFormat('dd-MM-yyyy').format(picked);
       });
     }
   }
@@ -75,14 +82,17 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Reserva guardada exitosamente')),
         );
+        Navigator.of(context).pop();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al guardar la reserva: $e')),
         );
-      } finally {
-        Navigator.of(context).pop();
       }
     }
+  }
+
+  void _handleReservationsOption(String value, Reservation reservation) {
+    // logica para las opciones de las reservas
   }
 
   void _showReservationDialog() {
@@ -156,19 +166,67 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
       appBar: AppBar(
         title: const Text('Reservas'),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Créditos del usuario
+            StreamBuilder<int>(
+              stream: _reservationsService.getCredits(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                final int credits = snapshot.data ?? 0;
+                return SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    padding: const EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(10.0),
+                      border: Border.all(
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.credit_card,
+                            size: 30, color: Colors.grey.shade700),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Créditos disponibles: $credits',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+
+            // Botón para hacer nueva reserva
             ElevatedButton(
               onPressed: _showReservationDialog,
               child: const Text('Hacer Nueva Reserva'),
             ),
             const SizedBox(height: 20),
+
             Text(
               'Tus Reservas',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 10),
+
+            // Lista de reservas
             Expanded(
               child: StreamBuilder<List<Reservation>>(
                 stream: _reservationsService.getReservations(),
@@ -180,6 +238,11 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   }
                   final reservations = snapshot.data ?? [];
+                  if (reservations.isEmpty) {
+                    return const Center(
+                      child: Text('No tienes reservas'),
+                    );
+                  }
                   return ListView.builder(
                     itemCount: reservations.length,
                     itemBuilder: (context, index) {
@@ -189,7 +252,61 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
                           DateFormat('dd-MM-yyyy - HH:mm')
                               .format(reservation.date.toDate().toLocal()),
                         ),
-                        subtitle: Text('Estado: ${reservation.status}'),
+                        subtitle: Text(
+                          reservation.status == 0
+                              ? 'Pendiente de Confirmación'
+                              : reservation.status == 1
+                                  ? 'Confirmada'
+                                  : 'Cancelada',
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              reservation.status == 1
+                                  ? Icons.check_circle
+                                  : (reservation.status == 0
+                                      ? Icons.hourglass_empty
+                                      : Icons.cancel),
+                              color: reservation.status == 1
+                                  ? Colors.green
+                                  : (reservation.status == 0
+                                      ? Colors.orange
+                                      : Colors.red),
+                            ),
+                            const SizedBox(width: 8),
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert),
+                              onSelected: (value) {
+                                _handleReservationsOption(value, reservation);
+                              },
+                              itemBuilder: (BuildContext context) {
+                                return [
+                                  const PopupMenuItem<String>(
+                                    value: 'confirm',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.check, color: Colors.green),
+                                        SizedBox(width: 8),
+                                        Text('Confirmar reserva'),
+                                      ],
+                                    ),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'cancel',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.cancel, color: Colors.red),
+                                        SizedBox(width: 8),
+                                        Text('Cancelar reserva'),
+                                      ],
+                                    ),
+                                  ),
+                                ];
+                              },
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );
