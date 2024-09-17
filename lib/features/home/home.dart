@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../dark_mode_screen.dart';
-import '../profile/profile_screen.dart';
-import '../reservations/reservations_screen.dart'; // Nueva pantalla para reservas
+
+import 'package:proyecto_gimnasio_esquel/features/dark_mode_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     // Contenido de la pantalla inicial
-    ReservationsScreen(), // Nueva pantalla de reservas
+    const ReservationsScreen(), // pPantalla de reservas
     // Contenido de la pantalla de notificaciones
     const Center(child: Text('Notificaciones')),
     // Contenido de la pantalla del menú lateral
