@@ -186,7 +186,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
                       final reservation = reservations[index];
                       return ListTile(
                         title: Text(
-                          DateFormat('yyyy-MM-dd - HH:mm')
+                          DateFormat('dd-MM-yyyy - HH:mm')
                               .format(reservation.date.toDate().toLocal()),
                         ),
                         subtitle: Text('Estado: ${reservation.status}'),
