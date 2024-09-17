@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/services/reservations_service.dart';
@@ -184,7 +185,12 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
                     itemBuilder: (context, index) {
                       final reservation = reservations[index];
                       return ListTile(
-                        title: Text('${reservation.date.toDate().toLocal()}'),
+                        title: Text(
+                          DateFormat('yyyy-MM-dd - HH:mm').format(reservation
+                              .date
+                              .toDate()
+                              .toLocal()), // Formatea la fecha con horas y minutos
+                        ),
                         subtitle: Text('Estado: ${reservation.status}'),
                       );
                     },
