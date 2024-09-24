@@ -70,7 +70,7 @@ class ReservationsService {
           .doc(reservation.id)
           .update({'status': 3});
     } catch (e) {
-      throw Exception('Error al cancelar la reserva: $e');
+      throw Exception('Error al eliminar la reserva: $e');
     }
   }
 }
