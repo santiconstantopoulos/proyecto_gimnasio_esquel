@@ -47,14 +47,12 @@ class CreditsService {
           .collection('credits')
           .doc('available_credits');
 
-      // Ejecutar la transacción
       await _firestore.runTransaction((transaction) async {
         DocumentSnapshot snapshot = await transaction.get(docRef);
         if (!snapshot.exists) {
           throw Exception('No se encontraron créditos disponibles');
         }
 
-        // Cast the snapshot data to a Map
         final data = snapshot.data() as Map<String, dynamic>;
 
         final currentCredits = data['credit'] ?? 0;
@@ -62,7 +60,6 @@ class CreditsService {
           throw Exception('No tienes suficientes créditos');
         }
 
-        // Actualizar los créditos
         transaction.update(docRef, {
           'credit': currentCredits - creditsToConsume,
         });
