@@ -11,6 +11,7 @@ class ReservationPopupMenu extends StatelessWidget {
     required this.onOptionSelected,
   });
 
+  //TODO: motrar opciones dependiendo del estado actual y la fecha, ej: no mostrar opcion de confirmar reserva si ya se paso la fecha
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(

@@ -35,6 +35,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     super.dispose();
   }
 
+  //TODO: mover dialogo de reservas a widget
   void _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -163,6 +164,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     }
   }
 
+  //TODO: separar en metodos
   void _handleReservationsOption(String value, Reservation reservation) async {
     if (value == 'confirm') {
       final creditsStream = _creditService.getCredits();
@@ -171,7 +173,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
                 content: Text(
-                    'No tienes créditos suficientes para confirmar la reserva.')),
+                    'No tienes créditos suficientes creditos para confirmar la reserva.')),
           );
           return;
         }
