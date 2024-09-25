@@ -263,7 +263,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reservas'),
+        title: const Text('Reservas'), centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

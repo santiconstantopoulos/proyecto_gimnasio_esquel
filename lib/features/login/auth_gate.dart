@@ -12,8 +12,8 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Proyecto Reserva de Gimnasios"),
-        actions: [
+        title: const Text("Gym Desarrollo App"), centerTitle: true,
+        /* actions: [
           // Botón de 3 puntos
           PopupMenuButton<int>(
             onSelected: (item) {
@@ -39,7 +39,7 @@ class AuthGate extends StatelessWidget {
               ),
             ],
           ),
-        ],
+        ], */
       ),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -89,11 +89,12 @@ class AuthGate extends StatelessWidget {
     );
   }
 
-  void _showSidebar(BuildContext context) {
+/*   void _showSidebar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Sidebar abierta')),
     );
-  }
+  } */
+
 
   Future<void> _signOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();

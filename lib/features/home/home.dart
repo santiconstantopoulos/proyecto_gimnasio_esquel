@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:proyecto_gimnasio_esquel/features/dark_mode_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
@@ -11,17 +10,48 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
+  late AnimationController _controller;
+  bool _showMoreOptions = false; // Control para mostrar/ocultar la lista
 
   final List<Widget> _screens = [
-    // Contenido de la pantalla inicial
-    const ReservationsScreen(), // Pantalla de reservas
-    // Contenido de la pantalla de notificaciones
+    const ReservationsScreen(),
     const Center(child: Text('Notificaciones')),
-    // Contenido de la pantalla del menú lateral
-    const Center(child: Text('Menú')),
+    const Center(child: Text('Contenido de la pantalla "Más"')), // Aquí va el contenido de la pantalla "Más"
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300), // Ajusta la duración de la animación
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggleMoreOptions() {
+    setState(() {
+      _showMoreOptions = !_showMoreOptions;
+      if (_showMoreOptions) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
+  }
+
+
+//TODO  Hace falta arreglar la sección "mas" para que abra todas las secciones posibles. Reservas, beneficios, creditos, historial, etc.
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +61,100 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(),
-                ),
-              );
+              // Lógica para abrir el perfil (opcional)
             },
           )
         ],
       ),
-      body: _screens[_selectedIndex],
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          _screens[_selectedIndex], // La pantalla actual
+          // La lista de opciones solo se muestra si _showMoreOptions es true
+          AnimatedOpacity(
+            opacity: _showMoreOptions ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: _showMoreOptions ? 200 : 0, // Ajusta la altura según la lista
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.edit),
+                    title: const Text('Editar Perfil'),
+                    onTap: () {
+                      // Navega a la pantalla de editar perfil
+                      _toggleMoreOptions();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(), // Ejemplo
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: const Text('Mi Perfil'),
+                    onTap: () {
+                      // Navega a la pantalla de perfil
+                      _toggleMoreOptions();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(), // Ejemplo
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: const Text('Cerrar Sesión'),
+                    onTap: () {
+                      // Maneja la lógica de cierre de sesión
+                      _toggleMoreOptions();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.notifications),
+                    title: const Text('Notificaciones'),
+                    onTap: () {
+                      // Navega a la pantalla de notificaciones
+                      _toggleMoreOptions();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Center(
+                              child: Text('Notificaciones Screen')), // Ejemplo
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
+            if (index == 2) {
+              _toggleMoreOptions();
+            } else if (_showMoreOptions) {
+              _toggleMoreOptions();
+            }
           });
         },
         items: const [
@@ -63,81 +171,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Más',
           ),
         ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text('Secciones de la App'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Inicio'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 0; // Selecciona Inicio
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.search),
-              title: const Text('Buscar'),
-              onTap: () {
-                // Lógica para navegar a Buscar
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.notifications),
-              title: const Text('Notificaciones'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 1;
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.favorite),
-              title: const Text('Favoritos'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.local_offer),
-              title: const Text('Ofertas'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Opciones'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const DarkModeScreen()),
-                );
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.headset_mic),
-              title: const Text('Ayuda'),
-              onTap: () {
-                // Lógica para navegar a Ayuda
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
       ),
     );
   }
