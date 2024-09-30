@@ -1,0 +1,76 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+
+class ReservationsService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuthService _authService = AuthService();
+
+  Stream<List<Reservation>> getReservations() {
+    return _firestore
+        .collection('users')
+        .doc(_authService.userId)
+        .collection('reservations')
+        .where('status', whereIn: [0, 1, 2])
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Reservation.fromFirestore(doc.id, doc.data()))
+            .toList());
+  }
+
+  Future<void> createReservation(DateTime dateTime) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_authService.userId)
+          .collection('reservations')
+          .add({
+        'date': Timestamp.fromDate(dateTime),
+        'status': 0,
+      });
+    } catch (e) {
+      throw Exception('Error al guardar la reserva: $e');
+    }
+  }
+
+  Future<void> confirmReservation(Reservation reservation) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_authService.userId)
+          .collection('reservations')
+          .doc(reservation.id)
+          .update({'status': 1});
+    } catch (e) {
+      throw Exception('Error al confirmar la reserva: $e');
+    }
+  }
+
+  Future<void> cancelReservation(Reservation reservation) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_authService.userId)
+          .collection('reservations')
+          .doc(reservation.id)
+          .update({'status': 2});
+    } catch (e) {
+      throw Exception('Error al cancelar la reserva: $e');
+    }
+  }
+
+  Future<void> deleteReservation(Reservation reservation) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_authService.userId)
+          .collection('reservations')
+          .doc(reservation.id)
+          .update({'status': 3});
+    } catch (e) {
+      throw Exception('Error al eliminar la reserva: $e');
+    }
+  }
+}
