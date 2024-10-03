@@ -6,6 +6,7 @@ class CreditsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
 
+  // Obtiene los creditos, si no existe el documento lo crea
   Stream<int> getCredits() async* {
     String userId = _authService.userId;
     DocumentReference<Map<String, dynamic>> creditsDoc = _firestore
@@ -34,22 +35,7 @@ class CreditsService {
     });
   }
 
-  Future<int> getSnapshotCredits() async {
-    final snapshot = await _firestore
-        .collection('users')
-        .doc(_authService.userId)
-        .collection('credits')
-        .doc('available_credits')
-        .get();
-
-    if (snapshot.exists) {
-      final data = snapshot.data();
-      return data?['credit'] ?? 0;
-    } else {
-      return 0;
-    }
-  }
-
+  // Consume creditos
   Future<void> consumeCredits(int creditsToConsume) async {
     try {
       DocumentReference docRef = _firestore
@@ -80,6 +66,7 @@ class CreditsService {
     }
   }
 
+  // Retorna creditos
   Future<void> returnCredits(int creditsToReturn) async {
     try {
       DocumentReference docRef = _firestore

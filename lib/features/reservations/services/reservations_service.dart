@@ -7,6 +7,7 @@ class ReservationsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
 
+  // Obtiene las reservaciones
   Stream<List<Reservation>> getReservations() {
     return _firestore
         .collection('users')
@@ -26,6 +27,7 @@ class ReservationsService {
         });
   }
 
+  // Crea una reservacion
   Future<void> createReservation(DateTime dateTime) async {
     try {
       await _firestore
@@ -41,6 +43,7 @@ class ReservationsService {
     }
   }
 
+  // Confirma una reservacion
   Future<void> confirmReservation(Reservation reservation) async {
     try {
       await _firestore
@@ -54,6 +57,7 @@ class ReservationsService {
     }
   }
 
+  // Cancela una reservacion
   Future<void> cancelReservation(Reservation reservation) async {
     try {
       await _firestore
@@ -67,6 +71,7 @@ class ReservationsService {
     }
   }
 
+  // Elimina una reservacion
   Future<void> deleteReservation(Reservation reservation) async {
     try {
       await _firestore

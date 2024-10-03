@@ -6,6 +6,7 @@ class ProfileService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
 
+  // Obtiene la informacion de perfil, si no existe crea una por default
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile() async {
     String userId = _authService.userId;
 
@@ -30,6 +31,7 @@ class ProfileService {
     return profileSnapshot;
   }
 
+  // Actualiza el nombre de usuario
   Future<void> updateUserName(String newName) async {
     String userId = _authService.userId;
     await _firestore
@@ -40,6 +42,7 @@ class ProfileService {
         .update({'name': newName});
   }
 
+  // Actualiza la imagen de perfil
   Future<void> updateUserProfileImage(String imageUrl) async {
     String userId = _authService.userId;
     await _firestore
