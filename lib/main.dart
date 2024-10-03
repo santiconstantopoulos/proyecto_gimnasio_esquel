@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 
-import 'package:proyecto_gimnasio_esquel/features/login/auth_gate.dart';
+import 'package:proyecto_gimnasio_esquel/features/login/auth_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthGate(),
+      home: const AuthScreen(),
     );
   }
 }

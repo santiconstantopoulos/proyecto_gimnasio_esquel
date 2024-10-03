@@ -8,16 +8,39 @@ class ProfileService {
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile() async {
     String userId = _authService.userId;
-    return _firestore
+
+    DocumentReference<Map<String, dynamic>> profileDoc = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('profile')
+        .doc('profile_data');
+
+    DocumentSnapshot<Map<String, dynamic>> profileSnapshot =
+        await profileDoc.get();
+
+    if (!profileSnapshot.exists) {
+      await profileDoc.set({
+        'name': 'Nuevo usuario',
+        'profile_image_url': 'https://example.com/default_avatar.jpg',
+      });
+
+      profileSnapshot = await profileDoc.get();
+    }
+
+    return profileSnapshot;
+  }
+
+  Future<void> updateUserName(String newName) async {
+    String userId = _authService.userId;
+    await _firestore
         .collection('users')
         .doc(userId)
         .collection('profile')
         .doc('profile_data')
-        .get();
+        .update({'name': newName});
   }
 
-  Future<void> updateUserProfile(
-      {required String name, required String profileImageUrl}) async {
+  Future<void> updateUserProfileImage(String imageUrl) async {
     String userId = _authService.userId;
     await _firestore
         .collection('users')
@@ -25,8 +48,7 @@ class ProfileService {
         .collection('profile')
         .doc('profile_data')
         .update({
-      'name': name,
-      'profile_image_url': profileImageUrl,
+      'profile_image_url': imageUrl,
     });
   }
 }

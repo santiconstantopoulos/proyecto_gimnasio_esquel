@@ -1,45 +1,25 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
-
 import 'package:proyecto_gimnasio_esquel/features/home/home.dart';
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+class AuthScreen extends StatefulWidget {
+  const AuthScreen({super.key});
 
+  @override
+  _AuthGateState createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Gym Desarrollo App"), centerTitle: true,
-        /* actions: [
-          // Botón de 3 puntos
-          PopupMenuButton<int>(
-            onSelected: (item) {
-              switch (item) {
-                case 0:
-                  // Mostrar sidebar
-                  _showSidebar(context);
-                  break;
-                case 1:
-                  // Cerrar sesión
-                  _signOut(context);
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem<int>(
-                value: 0,
-                child: Text('Ayuda'),
-              ),
-              const PopupMenuItem<int>(
-                value: 1,
-                child: Text('Cerrar sesión'),
-              ),
-            ],
-          ),
-        ], */
+        title: const Text("Gym Desarrollo App"),
+        centerTitle: true,
       ),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -52,15 +32,6 @@ class AuthGate extends StatelessWidget {
                     clientId:
                         "1092870181448-enq21pikqoqk2ipndi45fqkejtj51he2.apps.googleusercontent.com"),
               ],
-              // headerBuilder: (context, constraints, shrinkOffset) {
-              //   return Padding(
-              //     padding: const EdgeInsets.all(20),
-              //     child: AspectRatio(
-              //       aspectRatio: 1,
-              //       child: Image.asset('assets/image.png'),
-              //     ),
-              //   );
-              // },
               subtitleBuilder: (context, action) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -68,7 +39,7 @@ class AuthGate extends StatelessWidget {
                       ? const Text(
                           'Bienvenido a Gym App, por favor inicie sesión!')
                       : const Text(
-                          'Bienvenido a Gym App, por favor registrese!'),
+                          'Bienvenido a Gym App, por favor regístrese!'),
                 );
               },
               footerBuilder: (context, action) {
@@ -87,16 +58,5 @@ class AuthGate extends StatelessWidget {
         },
       ),
     );
-  }
-
-/*   void _showSidebar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sidebar abierta')),
-    );
-  } */
-
-
-  Future<void> _signOut(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
   }
 }

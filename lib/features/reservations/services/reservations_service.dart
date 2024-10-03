@@ -15,9 +15,15 @@ class ReservationsService {
         .where('status', whereIn: [0, 1, 2])
         .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Reservation.fromFirestore(doc.id, doc.data()))
-            .toList());
+        .map((snapshot) {
+          if (snapshot.docs.isEmpty) {
+            return <Reservation>[];
+          } else {
+            return snapshot.docs
+                .map((doc) => Reservation.fromFirestore(doc.id, doc.data()))
+                .toList();
+          }
+        });
   }
 
   Future<void> createReservation(DateTime dateTime) async {

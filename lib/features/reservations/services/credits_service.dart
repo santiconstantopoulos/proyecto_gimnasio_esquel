@@ -6,14 +6,25 @@ class CreditsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
 
-  Stream<int> getCredits() {
-    return _firestore
+  Stream<int> getCredits() async* {
+    String userId = _authService.userId;
+    DocumentReference<Map<String, dynamic>> creditsDoc = _firestore
         .collection('users')
-        .doc(_authService.userId)
+        .doc(userId)
         .collection('credits')
-        .doc('available_credits')
-        .snapshots()
-        .map((snapshot) {
+        .doc('available_credits');
+
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await creditsDoc.get();
+
+    if (!snapshot.exists) {
+      await creditsDoc.set({
+        'credit': 0,
+      });
+
+      snapshot = await creditsDoc.get();
+    }
+
+    yield* creditsDoc.snapshots().map((snapshot) {
       if (snapshot.exists) {
         final data = snapshot.data();
         return data?['credit'] ?? 0;

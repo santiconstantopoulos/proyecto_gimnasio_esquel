@@ -1,7 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+// profile_screen.dart
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/profile/services/profile_services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:proyecto_gimnasio_esquel/features/profile/widgets/profile_avatar.dart';
+import 'widgets/profile_name.dart';
+import 'widgets/profile_edit_button.dart';
+import 'widgets/profile_avatar_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,8 +22,10 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileService _profileService = ProfileService();
-  String userName = "Cargando..."; // Placeholder mientras carga el perfil
-  String profileImageUrl = ""; // Placeholder para la imagen del perfil
+  String userName = "Cargando...";
+  String profileImageUrl = "";
+  bool isEditing = false;
+  final TextEditingController _nameController = TextEditingController();
 
   @override
   void initState() {
@@ -23,20 +35,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadUserProfile() async {
     try {
-      // Obtiene el perfil del usuario desde Firestore
       DocumentSnapshot<Map<String, dynamic>> profileData =
           await _profileService.getUserProfile();
 
-      // Extrae el nombre y la URL de la imagen de perfil de los datos
+      String? fetchedProfileImageUrl = profileData.data()?['profile_image_url'];
+
+      if (fetchedProfileImageUrl == null || fetchedProfileImageUrl.isEmpty) {
+        final Reference defaultImageRef = FirebaseStorage.instance
+            .ref()
+            .child('profile_images/default_avatar.jpg');
+        fetchedProfileImageUrl = await defaultImageRef.getDownloadURL();
+      }
+
       setState(() {
         userName = profileData.data()?['name'] ?? 'Usuario desconocido';
-        profileImageUrl = profileData.data()?['profile_image_url'] ??
-            'https://picsum.photos/200';
+        profileImageUrl = fetchedProfileImageUrl!;
+        _nameController.text = userName;
       });
     } catch (e) {
       setState(() {
-        userName = "Error al cargar perfil";
+        userName = "Error al cargar perfil $e";
       });
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    try {
+      await _profileService.updateUserName(_nameController.text);
+      setState(() {
+        userName = _nameController.text;
+        isEditing = false;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar el perfil: $e')),
+      );
+    }
+  }
+
+  Future<void> _updateProfileImage(XFile? image) async {
+    if (image != null) {
+      try {
+        final file = File(image.path);
+        final String nameFile = file.path.split("/").last;
+        final FirebaseStorage storage = FirebaseStorage.instance;
+
+        Reference ref = storage.ref().child("profile_images").child(nameFile);
+
+        final UploadTask uploadTask = ref.putFile(file);
+        final TaskSnapshot snapshot = await uploadTask.whenComplete(() => true);
+        final String downloadUrl = await snapshot.ref.getDownloadURL();
+
+        await _profileService.updateUserProfileImage(downloadUrl);
+
+        setState(() {
+          profileImageUrl = downloadUrl;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Imagen de perfil actualizada')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error al actualizar la imagen de perfil: $e')),
+        );
+      }
     }
   }
 
@@ -50,24 +114,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Muestra la imagen de perfil
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(profileImageUrl),
+            isEditing
+                ? ProfileImagePicker(
+                    profileImageUrl: profileImageUrl,
+                    onImagePicked: _updateProfileImage,
+                  )
+                : ProfileAvatar(profileImageUrl: profileImageUrl),
+            const SizedBox(height: 20),
+            ProfileName(
+              isEditing: isEditing,
+              userName: userName,
+              nameController: _nameController,
             ),
             const SizedBox(height: 20),
-            // Muestra el nombre del usuario
-            Text(
-              userName,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            // Botón para editar el perfil
-            ElevatedButton(
-              onPressed: () {
-                // Lógica para editar el perfil
+            ProfileEditButton(
+              isEditing: isEditing,
+              onSave: _saveProfile,
+              onEdit: () {
+                setState(() {
+                  isEditing = true;
+                });
               },
-              child: const Text('Editar perfil'),
+              onCancel: () {
+                setState(() {
+                  isEditing = false;
+                  _nameController.text = userName;
+                });
+              },
             ),
           ],
         ),
