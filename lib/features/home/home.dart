@@ -1,8 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart'; // Importa MenuScreen
+import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,36 +13,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
-  late AnimationController _controller;
 
   final List<Widget> _screens = [
     const ReservationsScreen(),
     const Center(child: Text('Notificaciones')),
     const Center(child: Text('Beneficios')),
-    const MenuScreen(), // Agrega MenuScreen a la lista
+    const MenuScreen(), 
   ];
-
-  // ... (resto del código)
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(), 
-                ),
-              );
-            },
-          )
-        ],
-      ),
-      body: _screens[_selectedIndex], // La pantalla actual
+      body: _screens[_selectedIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _selectedIndex,
         height: 50,
