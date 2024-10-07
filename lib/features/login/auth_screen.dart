@@ -59,8 +59,4 @@ class _AuthGateState extends State<AuthScreen> {
       ),
     );
   }
-
-  _signOut(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-  }
 }

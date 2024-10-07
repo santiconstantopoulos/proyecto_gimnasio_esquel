@@ -8,4 +8,8 @@ class AuthService {
 
   // Obtiene el ID del usuario actual
   String get userId => currentUser?.uid ?? 'unknown_user';
+
+  signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
 }

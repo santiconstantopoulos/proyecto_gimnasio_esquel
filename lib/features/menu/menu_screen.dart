@@ -1,16 +1,61 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/login/auth_gate.dart';
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
-class MenuScreen extends StatelessWidget {
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:proyecto_gimnasio_esquel/features/login/auth_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/profile/services/profile_services.dart';
+
+class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
+
+  @override
+  _MenuScreenState createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
+  final ProfileService _profileService = ProfileService();
+  final AuthService _authService = AuthService();
+  String userName = "Cargando...";
+  String profileImageUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> profileData =
+          await _profileService.getUserProfile();
+
+      String? fetchedProfileImageUrl = profileData.data()?['profile_image_url'];
+
+      if (fetchedProfileImageUrl == null || fetchedProfileImageUrl.isEmpty) {
+        final Reference defaultImageRef = FirebaseStorage.instance
+            .ref()
+            .child('profile_images/default_avatar.jpg');
+        fetchedProfileImageUrl = await defaultImageRef.getDownloadURL();
+      }
+
+      setState(() {
+        userName = profileData.data()?['name'] ?? 'Usuario desconocido';
+        profileImageUrl = fetchedProfileImageUrl!;
+      });
+    } catch (e) {
+      setState(() {
+        userName = "Error al cargar perfil $e";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-      ),
+      appBar: AppBar(),
       body: Column(
         children: [
           Padding(
@@ -26,8 +71,11 @@ class MenuScreen extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  const CircleAvatar(
-                    backgroundImage: NetworkImage('https://picsum.photos/200'), // Reemplaza con la URL de la imagen del usuario
+                  CircleAvatar(
+                    backgroundImage: profileImageUrl.isNotEmpty
+                        ? NetworkImage(profileImageUrl)
+                        : const NetworkImage(
+                            'https://picsum.photos/200'), // Imagen predeterminada
                     radius: 30,
                   ),
                   const SizedBox(width: 16),
@@ -43,7 +91,9 @@ class MenuScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        child: const Text('Santiago Joaquin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        child: Text(userName,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
@@ -55,7 +105,8 @@ class MenuScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        child: const Text('Mi perfil', style: TextStyle(fontSize: 16)),
+                        child: const Text('Mi perfil',
+                            style: TextStyle(fontSize: 16)),
                       ),
                     ],
                   ),
@@ -65,7 +116,6 @@ class MenuScreen extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            
           ),
           // Resto de las opciones del menú
           Expanded(
@@ -85,18 +135,20 @@ class MenuScreen extends StatelessWidget {
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop(); // Cierra el diálogo
+                                Navigator.of(context)
+                                    .pop(); // Cierra el diálogo
                               },
                               child: const Text('Cancelar'),
                             ),
                             TextButton(
                               onPressed: () async {
                                 // Llama a signOut desde AuthGate
-                                await const AuthGate()._signOut(context);
+                                await _authService.signOut();
                                 // Después de cerrar sesión, vuelve a AuthGate
                                 Navigator.pushAndRemoveUntil(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const AuthGate()),
+                                  MaterialPageRoute(
+                                      builder: (context) => const AuthScreen()),
                                   (route) => false,
                                 );
                               },
@@ -114,12 +166,5 @@ class MenuScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-extension on AuthGate {
-  _signOut(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-
   }
 }
