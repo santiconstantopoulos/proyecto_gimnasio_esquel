@@ -18,4 +18,11 @@ class Reservation {
       status: data['status'] as int,
     );
   }
+
+  bool get isPending => status == 0;
+  bool get isConfirmed => status == 1;
+  bool get isCancelled => status == 2;
+  bool get isDeleted => status == 3;
+
+  DateTime get reservationDate => date.toDate();
 }

@@ -14,7 +14,7 @@ class ReservationsService {
         .doc(_authService.userId)
         .collection('reservations')
         .where('status', whereIn: [0, 1, 2])
-        .orderBy('date', descending: true)
+        .orderBy('date', descending: false)
         .snapshots()
         .map((snapshot) {
           if (snapshot.docs.isEmpty) {
