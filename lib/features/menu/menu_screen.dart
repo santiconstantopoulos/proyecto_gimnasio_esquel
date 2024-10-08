@@ -72,10 +72,8 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage: profileImageUrl.isNotEmpty
-                        ? NetworkImage(profileImageUrl)
-                        : const NetworkImage(
-                            'https://picsum.photos/200'), // Imagen predeterminada
+                    backgroundImage:
+                        NetworkImage(profileImageUrl), // Imagen predeterminada
                     radius: 30,
                   ),
                   const SizedBox(width: 16),

@@ -1,7 +1,8 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart'; 
+import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,9 +17,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   final List<Widget> _screens = [
     const ReservationsScreen(),
-    const Center(child: Text('Notificaciones')),
+    const NotificationsScreen(),
     const Center(child: Text('Beneficios')),
-    const MenuScreen(), 
+    const MenuScreen(),
   ];
 
   @override
@@ -30,8 +31,10 @@ class _HomeScreenState extends State<HomeScreen>
         height: 50,
         items: const <Widget>[
           Icon(Icons.home, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-          Icon(Icons.notifications, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-          Icon(Icons.shopping_bag, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+          Icon(Icons.notifications,
+              size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+          Icon(Icons.shopping_bag,
+              size: 30, color: Color.fromARGB(255, 255, 187, 0)),
           Icon(Icons.menu, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
         ],
         onTap: (index) {
