@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
@@ -46,11 +44,11 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
       try {
         await _reservationsService.createReservation(reservationDateTime);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reserva creada exitosamente.')),
+          const SnackBar(content: Text(AppStrings.reservationCreated)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al crear la reserva: $e')),
+          SnackBar(content: Text('${AppStrings.errorReservation}$e')),
         );
       }
     }
@@ -64,7 +62,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'No tienes créditos suficientes para confirmar la reserva.'),
+               AppStrings.errorCreditsReservation),
           ),
         );
         return;
@@ -73,11 +71,11 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
       await _reservationsService.confirmReservation(reservation);
       await _creditService.consumeCredits(1);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reserva confirmada y crédito consumido')),
+        const SnackBar(content: Text(AppStrings.reservaConfirmada)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al confirmar la reserva: $e')),
+        SnackBar(content: Text('${AppStrings.errorAlConfirmar}$e')),
       );
     }
   }
@@ -94,18 +92,18 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
         await _creditService.returnCredits(1);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Reserva cancelada y créditos devueltos')),
+              content: Text(AppStrings.reservaCancelada)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cancelar la reserva: $e')),
+          SnackBar(content: Text('${AppStrings.errorAlCancelar}$e')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text(
-                'No se puede cancelar la reserva, faltan menos de 30 minutos')),
+                AppStrings.notDeleteReservation30)),
       );
     }
   }
@@ -123,22 +121,22 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
         await _creditService.returnCredits(1);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Reserva eliminada y créditos devueltos')),
+              content: Text(AppStrings.reservaEliminadaCR)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar la reserva: $e')),
+          SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
         );
       }
     } else if (reservation.status != 1) {
       try {
         await _reservationsService.deleteReservation(reservation);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reserva eliminada')),
+          const SnackBar(content: Text(AppStrings.reservaEliminada)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar la reserva: $e')),
+          SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
         );
       }
     } else if(reservation.isPending && reservationTime
@@ -149,11 +147,11 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
         await _creditService.returnCredits(1);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Reserva eliminada y créditos devueltos')),
+              content: Text(AppStrings.reservaEliminadaCR)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar la reserva: $e')),
+          SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
         );
       }
     } else if(reservation.isPending){
@@ -180,7 +178,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reservas'),
+        title: const Text(AppStrings.reservas),
         centerTitle: true,
       ),
       body: Padding(

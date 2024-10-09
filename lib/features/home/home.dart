@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart';
@@ -18,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen>
   final List<Widget> _screens = [
     const ReservationsScreen(),
     const NotificationsScreen(),
-    const Center(child: Text('Beneficios')),
+    const Center(child: Text(AppStrings.beneficios)),
     const MenuScreen(),
   ];
 
