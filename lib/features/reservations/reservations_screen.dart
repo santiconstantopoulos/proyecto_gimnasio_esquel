@@ -61,8 +61,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
       if (credits <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-               AppStrings.errorCreditsReservation),
+            content: Text(AppStrings.errorCreditsReservation),
           ),
         );
         return;
@@ -84,26 +83,45 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     Timestamp reservationTime = reservation.date;
     DateTime now = DateTime.now();
 
-    if (reservationTime
-        .toDate()
-        .isAfter(now.add(const Duration(minutes: 30)))) {
+    if (reservation.isPending) {
       try {
         await _reservationsService.cancelReservation(reservation);
-        await _creditService.returnCredits(1);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(AppStrings.reservaCancelada)),
+          const SnackBar(content: Text(AppStrings.reservaCancelada)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${AppStrings.errorAlCancelar}$e')),
         );
       }
+    } else if (reservation.isConfirmed) {
+      DateTime reservationDateTime = reservationTime.toDate();
+
+      if (reservationDateTime.isAfter(now.add(const Duration(minutes: 30)))) {
+        try {
+          await _reservationsService.cancelReservation(reservation);
+          await _creditService.returnCredits(1);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text(AppStrings.reservaCanceladaConRetorno)),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${AppStrings.errorAlCancelar}$e')),
+          );
+        }
+      } else if (reservationDateTime.isAfter(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.notCancelReservation30)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.notCancelReservationOutDate)),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                AppStrings.notDeleteReservation30)),
+        const SnackBar(content: Text(AppStrings.notCancel)),
       );
     }
   }
@@ -111,24 +129,10 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
   void _handleDeleteReservation(Reservation reservation) async {
     Timestamp reservationTime = reservation.date;
     DateTime now = DateTime.now();
+    DateTime reservationDateTime = reservationTime.toDate();
 
-    if (reservation.status == 1 &&
-        reservationTime
-            .toDate()
-            .isAfter(now.add(const Duration(minutes: 30)))) {
-      try {
-        await _reservationsService.deleteReservation(reservation);
-        await _creditService.returnCredits(1);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(AppStrings.reservaEliminadaCR)),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
-        );
-      }
-    } else if (reservation.status != 1) {
+    if (reservation.isPending || reservation.isCancelled) {
+      // Pendiente o Cancelada
       try {
         await _reservationsService.deleteReservation(reservation);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -139,28 +143,40 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
           SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
         );
       }
-    } else if(reservation.isPending && reservationTime
-            .toDate()
-            .isAfter(now.add(const Duration(minutes: 30)))) {
-              try {
-        await _reservationsService.deleteReservation(reservation);
-        await _creditService.returnCredits(1);
+    } else if (reservation.isConfirmed) {
+      // Confirmada
+      if (reservationDateTime.isAfter(now.add(const Duration(minutes: 30)))) {
+        // Faltan más de 30 minutos
+        try {
+          await _reservationsService.deleteReservation(reservation);
+          await _creditService.returnCredits(1);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text(AppStrings.reservaEliminadaConRetorno)),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
+          );
+        }
+      } else if (reservationDateTime.isAfter(now)) {
+        // Faltan menos de 30 minutos
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(AppStrings.reservaEliminadaCR)),
+          const SnackBar(content: Text(AppStrings.notDeleteReservation30)),
         );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
-        );
+      } else {
+        // Ya pasó la fecha de la reserva
+        try {
+          await _reservationsService.deleteReservation(reservation);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(AppStrings.reservaEliminada)),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${AppStrings.errorAlEliminar}$e')),
+          );
+        }
       }
-    } else if(reservation.isPending){
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                AppStrings.notDeleteReservation30)),
-      );
-      
     }
   }
 
