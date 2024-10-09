@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/login/auth_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
@@ -121,7 +122,7 @@ class _MenuScreenState extends State<MenuScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.logout),
-                  title: const Text('Cerrar Sesión'),
+                  title: const Text(AppStrings.logoutMessage),
                   onTap: () {
                     // Muestra un diálogo de confirmación
                     showDialog(
@@ -129,7 +130,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title: const Text('¿Estás seguro?'),
-                          content: const Text('¿Deseas cerrar sesión?'),
+                          content: const Text(AppStrings.confirmLogoutMessage),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -150,7 +151,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                   (route) => false,
                                 );
                               },
-                              child: const Text('Cerrar Sesión'),
+                              child: const Text(AppStrings.logoutMessage),
                             ),
                           ],
                         );

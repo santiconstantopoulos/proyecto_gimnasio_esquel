@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 
 import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/services/credits_service.dart';
@@ -140,12 +141,28 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
           SnackBar(content: Text('Error al eliminar la reserva: $e')),
         );
       }
-    } else {
+    } else if(reservation.isPending && reservationTime
+            .toDate()
+            .isAfter(now.add(const Duration(minutes: 30)))) {
+              try {
+        await _reservationsService.deleteReservation(reservation);
+        await _creditService.returnCredits(1);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Reserva eliminada y créditos devueltos')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al eliminar la reserva: $e')),
+        );
+      }
+    } else if(reservation.isPending){
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text(
-                'No se puede eliminar la reserva, faltan menos de 30 minutos')),
+                AppStrings.notDeleteReservation30)),
       );
+      
     }
   }
 
