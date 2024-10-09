@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 
 class ProfileService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
+  final LogService _logService = LogService();
 
-  // Obtiene la informacion de perfil, si no existe crea una por default
+  // Obtiene la información de perfil, si no existe crea una por defecto
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile() async {
     try {
       String userId = _authService.userId;
@@ -27,11 +29,18 @@ class ProfileService {
         });
 
         profileSnapshot = await profileDoc.get();
+
+        await _logService.createUserLog(
+            'Perfil creado para el usuario $userId', 'info', 'profile_service');
       }
 
       return profileSnapshot;
     } catch (e) {
-      throw Exception('Error al obtener la informacion de perfil: $e');
+      await _logService.createUserLog(
+          'Error al obtener la información de perfil: $e',
+          'error',
+          'profile_service');
+      throw Exception('Error al obtener la información de perfil: $e');
     }
   }
 
@@ -45,7 +54,16 @@ class ProfileService {
           .collection('profile')
           .doc('profile_data')
           .update({'name': newName});
+
+      await _logService.createUserLog(
+          'Nombre de usuario actualizado para $userId',
+          'info',
+          'profile_service');
     } catch (e) {
+      await _logService.createUserLog(
+          'Error al actualizar el nombre de usuario: $e',
+          'error',
+          'profile_service');
       throw Exception('Error al actualizar el nombre de usuario: $e');
     }
   }
@@ -60,7 +78,16 @@ class ProfileService {
           .collection('profile')
           .doc('profile_data')
           .update({'profile_image_url': imageUrl});
+
+      await _logService.createUserLog(
+          'Imagen de perfil actualizada para $userId',
+          'info',
+          'profile_service');
     } catch (e) {
+      await _logService.createUserLog(
+          'Error al actualizar la imagen de perfil: $e',
+          'error',
+          'profile_service');
       throw Exception('Error al actualizar la imagen de perfil: $e');
     }
   }

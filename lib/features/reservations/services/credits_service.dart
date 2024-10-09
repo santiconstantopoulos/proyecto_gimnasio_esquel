@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 
 class CreditsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
+  final LogService _logService = LogService();
 
-  // Obtiene los creditos, si no existe el documento lo crea
+  // Obtiene los créditos, si no existe el documento lo crea
   Stream<int> getCredits() async* {
     String userId = _authService.userId;
     DocumentReference<Map<String, dynamic>> creditsDoc = _firestore
@@ -21,8 +23,12 @@ class CreditsService {
       await creditsDoc.set({
         'credit': 0,
       });
-
       snapshot = await creditsDoc.get();
+
+      await _logService.createUserLog(
+          'Documento de créditos creado para el usuario $userId',
+          'info',
+          'credits_service');
     }
 
     yield* creditsDoc.snapshots().map((snapshot) {
@@ -35,7 +41,7 @@ class CreditsService {
     });
   }
 
-  // Consume creditos
+  // Consume créditos
   Future<void> consumeCredits(int creditsToConsume) async {
     try {
       DocumentReference docRef = _firestore
@@ -51,8 +57,8 @@ class CreditsService {
         }
 
         final data = snapshot.data() as Map<String, dynamic>;
-
         final currentCredits = data['credit'] ?? 0;
+
         if (currentCredits < creditsToConsume) {
           throw Exception('No tienes suficientes créditos');
         }
@@ -61,12 +67,17 @@ class CreditsService {
           'credit': currentCredits - creditsToConsume,
         });
       });
+
+      await _logService.createUserLog(
+          'Créditos consumidos: $creditsToConsume', 'info', 'credits_service');
     } catch (e) {
+      await _logService.createUserLog(
+          'Error al consumir créditos: $e', 'error', 'credits_service');
       throw Exception('Error al consumir créditos: $e');
     }
   }
 
-  // Retorna creditos
+  // Retorna créditos
   Future<void> returnCredits(int creditsToReturn) async {
     try {
       DocumentReference docRef = _firestore
@@ -82,14 +93,18 @@ class CreditsService {
         }
 
         final data = snapshot.data() as Map<String, dynamic>;
-
         final currentCredits = data['credit'] ?? 0;
 
         transaction.update(docRef, {
           'credit': currentCredits + creditsToReturn,
         });
       });
+
+      await _logService.createUserLog(
+          'Créditos retornados: $creditsToReturn', 'info', 'credits_service');
     } catch (e) {
+      await _logService.createUserLog(
+          'Error al retornar créditos: $e', 'error', 'credits_service');
       throw Exception('Error al retornar créditos: $e');
     }
   }
