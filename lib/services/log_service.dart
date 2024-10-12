@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 
 class LogService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

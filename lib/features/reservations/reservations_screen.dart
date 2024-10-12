@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 
 import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/services/credits_service.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/services/reservations_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/credits_display.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/new_reservation_button.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservation_dialog.dart';

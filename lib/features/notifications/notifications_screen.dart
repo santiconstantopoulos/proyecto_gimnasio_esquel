@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:proyecto_gimnasio_esquel/features/notifications/services/notifications_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/notifications_service.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});

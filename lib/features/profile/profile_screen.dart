@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/features/profile/services/profile_services.dart';
+import 'package:proyecto_gimnasio_esquel/services/profile_services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_gimnasio_esquel/features/profile/widgets/profile_avatar.dart';
 import 'widgets/profile_name.dart';

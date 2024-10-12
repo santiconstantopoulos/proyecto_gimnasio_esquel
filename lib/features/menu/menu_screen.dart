@@ -5,9 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/login/auth_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/profile/services/profile_services.dart';
+import 'package:proyecto_gimnasio_esquel/services/profile_services.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
