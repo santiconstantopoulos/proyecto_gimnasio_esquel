@@ -32,6 +32,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     super.dispose();
   }
 
+  // Dialogo para crear una reserva
   void _showReservationDialog() async {
     final DateTime? reservationDateTime = await showDialog<DateTime>(
       context: context,
@@ -54,31 +55,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     }
   }
 
-  void _handleConfirmReservation(Reservation reservation) async {
-    try {
-      final credits = await _creditService.getCredits().first;
-
-      if (credits <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.errorCreditsReservation),
-          ),
-        );
-        return;
-      }
-
-      await _reservationsService.confirmReservation(reservation);
-      await _creditService.consumeCredits(1);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.reservaConfirmada)),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${AppStrings.errorAlConfirmar}$e')),
-      );
-    }
-  }
-
+  // Cancela una reserva
   void _handleCancelReservation(Reservation reservation) async {
     Timestamp reservationTime = reservation.date;
     DateTime now = DateTime.now();
@@ -126,6 +103,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     }
   }
 
+  // Elimina una reserva
   void _handleDeleteReservation(Reservation reservation) async {
     Timestamp reservationTime = reservation.date;
     DateTime now = DateTime.now();
@@ -180,10 +158,9 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     }
   }
 
+  // Hadler de reservas
   void _handleReservationsOption(String value, Reservation reservation) {
-    if (value == 'confirm') {
-      _handleConfirmReservation(reservation);
-    } else if (value == 'cancel') {
+    if (value == 'cancel') {
       _handleCancelReservation(reservation);
     } else if (value == 'delete') {
       _handleDeleteReservation(reservation);
@@ -201,14 +178,14 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            CreditsDisplay(creditsStream: _creditService.getCredits()),
+            CreditsDisplay(creditsStream: _creditService.getUserCredits()),
             const SizedBox(height: 20),
             NewReservationButton(onPressed: _showReservationDialog),
             const SizedBox(height: 20),
             const ReservationsHeader(),
             const SizedBox(height: 10),
             ReservationsList(
-              reservationsStream: _reservationsService.getReservations(),
+              reservationsStream: _reservationsService.getUserReservations(),
               onOptionSelected: (value, reservation) {
                 _handleReservationsOption(value, reservation);
               },

@@ -27,7 +27,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
     _loadUsers();
   }
 
-  // Cargar los usuarios desde Firestore
+  // Carga los usuarios
   Future<void> _loadUsers() async {
     try {
       final users = await _usersService.getUsers();
@@ -56,9 +56,9 @@ class _CreditsScreenState extends State<CreditsScreen> {
   }
 
   // Agregar créditos
-  void _addCredits(User user, int credits) async {
+  void _addCreditsToUser(User user, int credits) async {
     try {
-      await _creditsService.addCredits(user.id, credits);
+      await _creditsService.addCreditsToUser(user.id, credits);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Se han agregado $credits créditos a ${user.name}'),
@@ -101,7 +101,7 @@ class _CreditsScreenState extends State<CreditsScreen> {
                       )
                     : UsersList(
                         users: _filteredUsers,
-                        onAddCredits: _addCredits,
+                        onAddCredits: _addCreditsToUser,
                       ),
           ),
         ],

@@ -7,8 +7,8 @@ class CreditsService {
   final AuthService _authService = AuthService();
   final LogService _logService = LogService();
 
-  // Obtiene los créditos, si no existe el documento lo crea
-  Stream<int> getCredits() async* {
+  // Obtiene los créditos del usuario logeado, si no existe el documento lo crea
+  Stream<int> getUserCredits() async* {
     String userId = _authService.userId;
     DocumentReference<Map<String, dynamic>> creditsDoc = _firestore
         .collection('users')
@@ -112,7 +112,7 @@ class CreditsService {
   }
 
   // Agrega créditos a un usuario (admin)
-  Future<void> addCredits(String userId, int creditsToAdd) async {
+  Future<void> addCreditsToUser(String userId, int creditsToAdd) async {
     try {
       DocumentReference docRef = _firestore
           .collection('users')
@@ -133,13 +133,13 @@ class CreditsService {
       });
 
       await _logService.createUserLog(
-        'Créditos agregados: $creditsToAdd',
+        'Créditos agregados: $creditsToAdd a usuario: $userId',
         'info',
         'credits_service',
       );
     } catch (e) {
       await _logService.createUserLog(
-        'Error al agregar créditos: $e',
+        'Error al agregar créditos a usuario: $userId: $e',
         'error',
         'credits_service',
       );
