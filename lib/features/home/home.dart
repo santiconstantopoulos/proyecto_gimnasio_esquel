@@ -1,9 +1,11 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
+import 'package:proyecto_gimnasio_esquel/features/credits/credits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen_admin.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen>
     _checkAdminStatus();
   }
 
+  //Verifica el si el usuario es admin
   Future<void> _checkAdminStatus() async {
     AuthService authService = AuthService();
     bool isAdmin = await authService.isAdmin;
@@ -44,7 +47,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Pantallas para administradores
   final List<Widget> _adminScreens = [
-    const Center(child: Text('Admin Dashboard')),
+    const ReservationsScreenAdmin(),
+    const CreditsScreen(),
     const NotificationsScreen(),
     const MenuScreen(),
   ];
@@ -60,7 +64,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Íconos para administradores
   final List<Widget> _adminIcons = const <Widget>[
-    Icon(Icons.dashboard, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.home, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.money, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.notifications,
         size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.menu, size: 30, color: Color.fromARGB(255, 255, 187, 0)),

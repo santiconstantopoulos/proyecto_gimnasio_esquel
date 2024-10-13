@@ -41,7 +41,7 @@ class CreditsService {
     });
   }
 
-  // Consume créditos
+  // Consume créditos al usuario logeado
   Future<void> consumeCredits(int creditsToConsume) async {
     try {
       DocumentReference docRef = _firestore
@@ -77,7 +77,7 @@ class CreditsService {
     }
   }
 
-  // Retorna créditos
+  // Retorna créditos al usuario logeado
   Future<void> returnCredits(int creditsToReturn) async {
     try {
       DocumentReference docRef = _firestore
@@ -106,6 +106,38 @@ class CreditsService {
       await _logService.createUserLog(
           'Error al retornar créditos: $e', 'error', 'credits_service');
       throw Exception('Error al retornar créditos: $e');
+    }
+  }
+
+  // Retorna créditos a un usuario (admin)
+  Future<void> addCredits(String userId, int creditsToAdd) async {
+    try {
+      DocumentReference docRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('credits')
+          .doc('available_credits');
+
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot snapshot = await transaction.get(docRef);
+        if (!snapshot.exists) {
+          throw Exception('No se encontraron créditos disponibles');
+        }
+
+        final data = snapshot.data() as Map<String, dynamic>;
+        final currentCredits = data['credit'] ?? 0;
+
+        transaction.update(docRef, {
+          'credit': currentCredits + creditsToAdd,
+        });
+      });
+
+      await _logService.createUserLog(
+          'Créditos agregados: $creditsToAdd', 'info', 'credits_service');
+    } catch (e) {
+      await _logService.createUserLog(
+          'Error al agregar créditos: $e', 'error', 'credits_service');
+      throw Exception('Error al agregar créditos: $e');
     }
   }
 }

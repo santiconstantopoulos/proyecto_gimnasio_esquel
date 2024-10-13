@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
 
 class ReservationPopupMenu extends StatelessWidget {
   final Reservation reservation;

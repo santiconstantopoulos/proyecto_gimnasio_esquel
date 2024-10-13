@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 

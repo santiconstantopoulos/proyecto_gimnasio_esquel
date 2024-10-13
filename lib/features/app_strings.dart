@@ -43,6 +43,8 @@ class AppStrings {
   // Otros
   static const String confirm = 'confirm';
   static const String reservas = 'Reservas';
+  static const String adminReservas = 'Administrar Reservas';
+  static const String agregarCreditos = 'Agregar Creditos';
   static const String delete = 'delete';
   static const String cancel = 'cancel';
 

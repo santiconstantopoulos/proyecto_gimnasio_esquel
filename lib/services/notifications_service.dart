@@ -53,6 +53,7 @@ class NotificationsService {
     }
   }
 
+  //Elimina un notificación
   Future<void> deleteNotification(String notificationId) async {
     try {
       String userId = _authService.userId;

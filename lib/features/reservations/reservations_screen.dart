@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 
-import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
 import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/credits_display.dart';

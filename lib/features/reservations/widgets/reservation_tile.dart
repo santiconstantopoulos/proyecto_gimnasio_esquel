@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservation_popup_menu.dart';
 
 class ReservationTile extends StatelessWidget {

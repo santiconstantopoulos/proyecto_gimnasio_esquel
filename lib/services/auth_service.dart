@@ -20,7 +20,6 @@ class AuthService {
           _firestore.collection('admins').doc(userId);
 
       DocumentSnapshot<Map<String, dynamic>> adminDoc = await profileDoc.get();
-      print(adminDoc.exists);
       return adminDoc.exists ? 0 : 1;
     } catch (e) {
       throw Exception('Error al obtener el tipo de usuario: $e');
