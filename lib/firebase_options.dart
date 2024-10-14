@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -33,10 +30,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -68,6 +62,28 @@ class DefaultFirebaseOptions {
     androidClientId: '1092870181448-u2cv8uca9m7sjbtl3o9df2jqhhcv61tc.apps.googleusercontent.com',
     iosClientId: '1092870181448-chdps3n2kp4sgdkap57c891m9q51jku5.apps.googleusercontent.com',
     iosBundleId: 'com.example.proyectoGimnacioEsquel',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyB_BkBn3S8ij4yJBv8LqzY74QyZhnMADhI',
+    appId: '1:1092870181448:web:335a8b3b79ef1294b0be7d',
+    messagingSenderId: '1092870181448',
+    projectId: 'proyecto-esquel-gimnasio',
+    authDomain: 'proyecto-esquel-gimnasio.firebaseapp.com',
+    databaseURL: 'https://proyecto-esquel-gimnasio-default-rtdb.firebaseio.com',
+    storageBucket: 'proyecto-esquel-gimnasio.appspot.com',
+    measurementId: 'G-LE611X57SQ',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyB_BkBn3S8ij4yJBv8LqzY74QyZhnMADhI',
+    appId: '1:1092870181448:web:e3384c5ea93f862cb0be7d',
+    messagingSenderId: '1092870181448',
+    projectId: 'proyecto-esquel-gimnasio',
+    authDomain: 'proyecto-esquel-gimnasio.firebaseapp.com',
+    databaseURL: 'https://proyecto-esquel-gimnasio-default-rtdb.firebaseio.com',
+    storageBucket: 'proyecto-esquel-gimnasio.appspot.com',
+    measurementId: 'G-FKX3GC7YX0',
   );
 
 }

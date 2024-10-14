@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:proyecto_gimnasio_esquel/features/reservations/models/reservarion.dart';
-import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ReservationsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
   final LogService _logService = LogService();
 
-  // Obtiene las reservaciones
-  Stream<List<Reservation>> getReservations() {
+  // Obtiene las reservaciones del usuario logeado
+  Stream<List<Reservation>> getUserReservations() {
     return _firestore
         .collection('users')
         .doc(_authService.userId)
@@ -27,6 +30,45 @@ class ReservationsService {
                 .toList();
           }
         });
+  }
+
+  // Obtiene todas las reservaciones como un Stream
+  Stream<List<Reservation>> getAllUserReservations() async* {
+    final StreamController<List<Reservation>> controller = StreamController();
+
+    final usersSnapshot = await _firestore.collection('users').get();
+
+    final List<Stream<List<Reservation>>> userReservationStreams = [];
+
+    for (var userDoc in usersSnapshot.docs) {
+      final userReservationsStream = userDoc.reference
+          .collection('reservations')
+          .where('status', whereIn: [0, 1, 2])
+          .orderBy('date', descending: false)
+          .snapshots()
+          .map((reservationsSnapshot) {
+            return reservationsSnapshot.docs.map((doc) {
+              return Reservation.fromFirestore(doc.id, doc.data());
+            }).toList();
+          });
+
+      userReservationStreams.add(userReservationsStream);
+    }
+
+    yield* Rx.combineLatest<List<Reservation>, List<Reservation>>(
+      userReservationStreams,
+      (List<List<Reservation>> userReservationLists) {
+        List<Reservation> combinedReservations = [];
+        for (var userRes in userReservationLists) {
+          combinedReservations.addAll(userRes);
+        }
+        return combinedReservations;
+      },
+    );
+
+    controller.onCancel = () {
+      controller.close();
+    };
   }
 
   // Crea una reservación

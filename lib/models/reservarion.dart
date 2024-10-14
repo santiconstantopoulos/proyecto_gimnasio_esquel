@@ -11,6 +11,7 @@ class Reservation {
     required this.status,
   });
 
+  // Factory para crear una reserva desde Firestore
   factory Reservation.fromFirestore(String id, Map<String, dynamic> data) {
     return Reservation(
       id: id,

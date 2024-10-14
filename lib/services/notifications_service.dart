@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 
 class NotificationsService {
@@ -53,6 +53,7 @@ class NotificationsService {
     }
   }
 
+  //Elimina un notificación
   Future<void> deleteNotification(String notificationId) async {
     try {
       String userId = _authService.userId;

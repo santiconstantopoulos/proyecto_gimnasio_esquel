@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:proyecto_gimnasio_esquel/features/login/services/auth_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 
 class ProfileService {
@@ -25,7 +25,8 @@ class ProfileService {
       if (!profileSnapshot.exists) {
         await profileDoc.set({
           'name': 'Nuevo usuario',
-          'profile_image_url': 'https://example.com/default_avatar.jpg',
+          'profile_image_url':
+              'https://firebasestorage.googleapis.com/v0/b/proyecto-esquel-gimnasio.appspot.com/o/profile_images%2Fdefault_avatar.jpg?alt=media&token=bbd5efba-b15b-46e1-a083-d40efde2ef00',
         });
 
         profileSnapshot = await profileDoc.get();
