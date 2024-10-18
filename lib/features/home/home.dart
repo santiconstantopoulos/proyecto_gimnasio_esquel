@@ -23,8 +23,10 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isAdmin = false;
   bool _loading = true;
 
-  Widget _qrIcon = const Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)); 
+  // Variable para almacenar el icono del QR
+  Icon _qrIcon = const Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)); 
 
+  // Servicio de reservas
   final ReservationsService _reservationsService = ReservationsService(); 
 
   @override
@@ -61,16 +63,17 @@ class _HomeScreenState extends State<HomeScreen>
 
   final List<Widget> _userScreens = [
     const ReservationsScreen(),
-    const GenerateQRPage(), // Actualiza la posición del QR en la lista
     const NotificationsScreen(),
+    const GenerateQRScreen(), // Actualiza la posición del QR en la lista
     const Center(child: Text(AppStrings.beneficios)),
     const MenuScreen(),
   ];
 
   final List<Widget> _adminScreens = [
     const ReservationsScreenAdmin(),
-    const CreditsScreen(),
     const NotificationsScreen(),
+    const GenerateQRScreen(), // Actualiza la posición del QR en la lista
+    const CreditsScreen(),
     const MenuScreen(),
   ];
 
@@ -104,11 +107,11 @@ class _HomeScreenState extends State<HomeScreen>
                 setState(() {
                   _selectedIndex = index;
                   // Si se selecciona el botón QR, navega a GenerateQRPage solo si está habilitado
-                  if (index == 1 && _icons[1] is Icon && (_icons[1] as Icon).icon == Icons.qr_code) {
+                  if (index == 1 && _qrIcon.icon == Icons.qr_code) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const GenerateQRPage(),
+                        builder: (context) => const GenerateQRScreen(),
                       ),
                     );
                   }

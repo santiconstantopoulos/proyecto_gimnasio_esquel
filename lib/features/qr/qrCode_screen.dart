@@ -5,14 +5,14 @@ import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/profile_services.dart'; 
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart'; 
 
-class GenerateQRPage extends StatefulWidget {
-  const GenerateQRPage({Key? key}) : super(key: key);
+class GenerateQRScreen extends StatefulWidget {
+  const GenerateQRScreen({Key? key}) : super(key: key);
 
   @override
-  _GenerateQRPageState createState() => _GenerateQRPageState();
+  _GenerateQRScreenState createState() => _GenerateQRScreenState();
 }
 
-class _GenerateQRPageState extends State<GenerateQRPage> {
+class _GenerateQRScreenState extends State<GenerateQRScreen> {
   final ProfileService _profileService = ProfileService();
   final ReservationsService _reservationsService = ReservationsService();
   final CreditsService _creditsService = CreditsService();
