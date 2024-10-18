@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 
-import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/credits_display.dart';
@@ -55,7 +55,7 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     }
   }
 
-  // Cancela una reserva
+  // Cancela una reserva //TODO: HAY QUE cambiar la logica de ispending y sacar lo de pendiente a la mierda
   void _handleCancelReservation(Reservation reservation) async {
     Timestamp reservationTime = reservation.date;
     DateTime now = DateTime.now();

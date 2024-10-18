@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_list.dart';
-import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 
 class ReservationsScreenAdmin extends StatefulWidget {
@@ -20,19 +20,6 @@ class _ReservationsScreenAdminState extends State<ReservationsScreenAdmin> {
     super.dispose();
   }
 
-  void _handleConfirmReservation(Reservation reservation) async {
-    try {
-      await _reservationsService.confirmReservation(reservation);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.reservaConfirmada)),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${AppStrings.errorAlConfirmar}$e')),
-      );
-    }
-  }
-
   void _handleCancelReservation(Reservation reservation) async {
     try {
       await _reservationsService.cancelReservation(reservation);
@@ -47,9 +34,7 @@ class _ReservationsScreenAdminState extends State<ReservationsScreenAdmin> {
   }
 
   void _handleReservationsOption(String value, Reservation reservation) {
-    if (value == 'confirm') {
-      _handleConfirmReservation(reservation);
-    } else if (value == 'cancel') {
+    if (value == 'cancel') {
       _handleCancelReservation(reservation);
     }
   }

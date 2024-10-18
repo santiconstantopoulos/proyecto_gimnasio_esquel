@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservation_popup_menu.dart';
 
 class ReservationTile extends StatelessWidget {
@@ -19,27 +19,27 @@ class ReservationTile extends StatelessWidget {
     return ListTile(
       title: Text(
         DateFormat('dd-MM-yyyy - HH:mm')
-            .format(reservation.date.toDate().toLocal()),
+            .format(reservation.reservationDate),
       ),
       subtitle: Text(
-        reservation.status == 0
-            ? 'Pendiente de Confirmación'
-            : reservation.status == 1
-                ? 'Confirmada'
-                : 'Cancelada',
+        reservation.isConfirmed
+            ? 'Confirmada'
+            : reservation.isCancelled
+                ? 'Cancelada'
+                : 'Eliminada',
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            reservation.status == 1
+            reservation.isConfirmed
                 ? Icons.check_circle
-                : (reservation.status == 0
-                    ? Icons.hourglass_empty
-                    : Icons.cancel),
-            color: reservation.status == 1
+                : (reservation.isCancelled
+                    ? Icons.cancel
+                    : Icons.delete),
+            color: reservation.isConfirmed
                 ? Colors.green
-                : (reservation.status == 0 ? Colors.orange : Colors.red),
+                : (reservation.isCancelled ? Colors.red : Colors.grey),
           ),
           const SizedBox(width: 8),
           ReservationPopupMenu(

@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 import 'package:rxdart/rxdart.dart';
@@ -12,7 +10,6 @@ class ReservationsService {
   final AuthService _authService = AuthService();
   final LogService _logService = LogService();
 
-  // Obtiene las reservaciones del usuario logeado
   Stream<List<Reservation>> getUserReservations() {
     return _firestore
         .collection('users')
@@ -32,7 +29,6 @@ class ReservationsService {
         });
   }
 
-  // Obtiene todas las reservaciones como un Stream
   Stream<List<Reservation>> getAllUserReservations() async* {
     final StreamController<List<Reservation>> controller = StreamController();
 
@@ -80,7 +76,7 @@ class ReservationsService {
           .collection('reservations')
           .add({
         'date': Timestamp.fromDate(dateTime),
-        'status': 0,
+        'status': 1, // 0: Pendiente(ya se sacó), 1: Confirmada, 2: Cancelada, 3: Eliminada
       });
 
       await _logService.createUserLog('Reserva creada para la fecha $dateTime',
@@ -92,7 +88,6 @@ class ReservationsService {
     }
   }
 
-  // Confirma una reservación
   Future<void> confirmReservation(Reservation reservation) async {
     try {
       await _firestore
@@ -113,7 +108,6 @@ class ReservationsService {
     }
   }
 
-  // Cancela una reservación
   Future<void> cancelReservation(Reservation reservation) async {
     try {
       await _firestore
@@ -134,7 +128,6 @@ class ReservationsService {
     }
   }
 
-  // Elimina una reservación
   Future<void> deleteReservation(Reservation reservation) async {
     try {
       await _firestore

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/models/reservarion.dart';
+import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 
 class ReservationPopupMenu extends StatelessWidget {
   final Reservation reservation;
@@ -23,20 +23,7 @@ class ReservationPopupMenu extends StatelessWidget {
       itemBuilder: (BuildContext context) {
         List<PopupMenuEntry<String>> options = [];
 
-        if (reservation.isPending && reservation.reservationDate.isAfter(now)) {
-          options.add(
-            const PopupMenuItem<String>(
-              value: 'confirm',
-              child: Row(
-                children: [
-                  Icon(Icons.check, color: Colors.green),
-                  SizedBox(width: 8),
-                  Text('Confirmar reserva'),
-                ],
-              ),
-            ),
-          );
-        }
+        // Elimina la lógica de "Confirmar reserva"
 
         if (!reservation.isCancelled && !reservation.isDeleted) {
           options.add(
