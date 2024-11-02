@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/credits/credits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/qr/qrCode_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/qr/qr_code_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen_admin.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
-import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,11 +22,8 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isAdmin = false;
   bool _loading = true;
 
-  // Variable para almacenar el icono del QR
-  Icon _qrIcon = const Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)); 
+  final Icon _qrIcon = const Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)); 
 
-  // Servicio de reservas
-  final ReservationsService _reservationsService = ReservationsService(); 
 
   @override
   void initState() {
@@ -41,30 +37,16 @@ class _HomeScreenState extends State<HomeScreen>
     setState(() {
       _isAdmin = isAdmin;
       _loading = false;
-      _updateQRButton(); // Actualiza el icono del QR al iniciar la pantalla
     });
   }
 
   // Función para actualizar el icono del QR. Si el usuario tiene una reserva para hoy, se muestra el icono de QR, si no, se muestra en gris
-  void _updateQRButton() async {
-    // Lógica para consultar si el usuario tiene una reserva hoy
-    final today = DateTime.now();
-    final reservations = await _reservationsService.getUserReservations().first;
-
-    _qrIcon = reservations.any((reservation) => 
-      reservation.reservationDate.year == today.year && 
-      reservation.reservationDate.month == today.month &&
-      reservation.reservationDate.day == today.day &&
-      reservation.isConfirmed 
-    ) ? const Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)) : const Icon(Icons.qr_code, size: 30, color: Colors.grey);
-
-    setState(() {}); // Actualiza el estado para que se renderice el cambio en el navbar
-  }
+  // ... (aca ifia el código para actualizar el icono pero no lo tenemos decidido todavia)
 
   final List<Widget> _userScreens = [
     const ReservationsScreen(),
     const NotificationsScreen(),
-    const GenerateQRScreen(), // Actualiza la posición del QR en la lista
+    const GenerateQRScreen(),
     const Center(child: Text(AppStrings.beneficios)),
     const MenuScreen(),
   ];
@@ -72,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen>
   final List<Widget> _adminScreens = [
     const ReservationsScreenAdmin(),
     const NotificationsScreen(),
-    const GenerateQRScreen(), // Actualiza la posición del QR en la lista
+    const GenerateQRScreen(),
     const CreditsScreen(),
     const MenuScreen(),
   ];

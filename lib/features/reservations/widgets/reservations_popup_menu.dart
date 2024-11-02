@@ -13,7 +13,6 @@ class ReservationPopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime now = DateTime.now();
 
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert),
@@ -22,8 +21,6 @@ class ReservationPopupMenu extends StatelessWidget {
       },
       itemBuilder: (BuildContext context) {
         List<PopupMenuEntry<String>> options = [];
-
-        // Elimina la lógica de "Confirmar reserva"
 
         if (!reservation.isCancelled && !reservation.isDeleted) {
           options.add(

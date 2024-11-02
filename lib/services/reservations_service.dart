@@ -67,8 +67,11 @@ class ReservationsService {
     };
   }
 
-  // Crea una reservación
-  Future<void> createReservation(DateTime dateTime) async {
+  Future<void> createReservation(DateTime dateTime,
+      {required String name,
+      required String instructorId,
+      required int capacity,
+      required List<Participant> participants}) async {
     try {
       await _firestore
           .collection('users')
@@ -76,7 +79,12 @@ class ReservationsService {
           .collection('reservations')
           .add({
         'date': Timestamp.fromDate(dateTime),
-        'status': 1, // 0: Pendiente(ya se sacó), 1: Confirmada, 2: Cancelada, 3: Eliminada
+        'status': 1,
+        'name': name,
+        'instructorId': instructorId,
+        'capacity': capacity,
+        'participants':
+            participants.map((participant) => participant.toMap()).toList(),
       });
 
       await _logService.createUserLog('Reserva creada para la fecha $dateTime',
@@ -147,4 +155,36 @@ class ReservationsService {
       throw Exception('Error al eliminar la reserva: $e');
     }
   }
+
+  Future<void> updateReservation(Reservation reservation,
+      {required String className,
+      required String instructorId,
+      required int capacity,
+      required List<Participant> participants}) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_authService.userId)
+          .collection('reservations')
+          .doc(reservation.id)
+          .update({
+        'className': className,
+        'instructorId': instructorId,
+        'capacity': capacity,
+        'participants':
+            participants.map((participant) => participant.toMap()).toList(),
+      });
+
+      await _logService.createUserLog('Reserva ${reservation.id} actualizada',
+          'info', 'reservations_service');
+    } catch (e) {
+      await _logService.createUserLog(
+          'Error al actualizar la reserva ${reservation.id}: $e',
+          'error',
+          'reservations_service');
+      throw Exception('Error al actualizar la reserva: $e');
+    }
+  }
+
+
 }

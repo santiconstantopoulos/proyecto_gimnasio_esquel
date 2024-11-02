@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:proyecto_gimnasio_esquel/models/user.dart'; 
-import 'package:proyecto_gimnasio_esquel/services/credits_service.dart'; 
-import 'package:proyecto_gimnasio_esquel/services/profile_services.dart'; 
-import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart'; 
+import 'package:proyecto_gimnasio_esquel/models/user.dart';
+import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
+import 'package:proyecto_gimnasio_esquel/services/profile_services.dart';
+import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 
 class GenerateQRScreen extends StatefulWidget {
-  const GenerateQRScreen({Key? key}) : super(key: key);
+  const GenerateQRScreen({super.key});
 
   @override
   _GenerateQRScreenState createState() => _GenerateQRScreenState();
@@ -16,8 +16,8 @@ class _GenerateQRScreenState extends State<GenerateQRScreen> {
   final ProfileService _profileService = ProfileService();
   final ReservationsService _reservationsService = ReservationsService();
   final CreditsService _creditsService = CreditsService();
-  User? currentUser; 
-  bool hasReservationToday = false; 
+  User? currentUser;
+  bool hasReservationToday = false;
 
   @override
   void initState() {
@@ -25,14 +25,16 @@ class _GenerateQRScreenState extends State<GenerateQRScreen> {
     _loadCurrentUser();
   }
 
+//TODO: Agregar los App Strings
+
   Future<void> _loadCurrentUser() async {
     try {
       final userDoc = await _profileService.getUserProfile();
       currentUser = User.fromFirestore(userDoc.id, userDoc.data()!);
-      await _checkReservationToday(); 
+      await _checkReservationToday();
       setState(() {});
     } catch (e) {
-      print('Error al cargar el usuario: $e');
+      SnackBar(content: Text('Error al cargar el usuario: $e'));
     }
   }
 
@@ -40,15 +42,15 @@ class _GenerateQRScreenState extends State<GenerateQRScreen> {
   Future<void> _checkReservationToday() async {
     try {
       final today = DateTime.now();
-      final reservations = await _reservationsService.getUserReservations().first; 
-      hasReservationToday = reservations.any((reservation) => 
-        reservation.reservationDate.year == today.year && 
-        reservation.reservationDate.month == today.month &&
-        reservation.reservationDate.day == today.day &&
-        reservation.isConfirmed 
-      );
+      final reservations =
+          await _reservationsService.getUserReservations().first;
+      hasReservationToday = reservations.any((reservation) =>
+          reservation.reservationDate.year == today.year &&
+          reservation.reservationDate.month == today.month &&
+          reservation.reservationDate.day == today.day &&
+          reservation.isConfirmed);
     } catch (e) {
-      print('Error al verificar la reserva: $e');
+      SnackBar(content: Text('Error al verificar la reserva: $e'));
     }
   }
 
@@ -91,7 +93,7 @@ class _GenerateQRScreenState extends State<GenerateQRScreen> {
             // Mostrar el QR si el usuario tiene una reserva para hoy
             if (hasReservationToday)
               QrImageView(
-                data: currentUser!.qrCode!,
+                data: currentUser!.qrCode,
                 version: QrVersions.auto,
                 size: 200.0,
               )

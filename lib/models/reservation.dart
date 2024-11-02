@@ -4,19 +4,29 @@ class Reservation {
   final String id;
   final Timestamp date;
   final int status;
+  final String name;
+  final String instructorId;
+  final int capacity;
+  List<Participant> participants = [];
 
-  Reservation({
-    required this.id,
-    required this.date,
-    required this.status,
-  });
+  Reservation(
+      {required this.id,
+      required this.date,
+      required this.status,
+      required this.name,
+      required this.instructorId,
+      required this.capacity,
+      required this.participants});
 
-  // Factory para crear una reserva desde Firestore
   factory Reservation.fromFirestore(String id, Map<String, dynamic> data) {
     return Reservation(
       id: id,
       date: data['date'] as Timestamp,
       status: data['status'] as int,
+      name: data['name'] as String,
+      instructorId: data['instructorId'] as String,
+      capacity: data['capacity'] as int,
+      participants: [],
     );
   }
 
@@ -26,4 +36,20 @@ class Reservation {
   bool get isDeleted => status == 3;
 
   DateTime get reservationDate => date.toDate();
+}
+
+class Participant {
+  final String name;
+  final String status;
+
+  Participant({
+    required this.name,
+    required this.status,
+  });
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'status': status,
+    };
+  }
 }

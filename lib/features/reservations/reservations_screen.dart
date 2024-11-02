@@ -1,15 +1,16 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
-
+import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_list.dart';
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
-import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/credits_display.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/new_reservation_button.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservation_dialog.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/new_reservations_button.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_header.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_list.dart';
+
+import '../../services/credits_service.dart';
 
 class ReservationsScreen extends StatefulWidget {
   const ReservationsScreen({super.key});
@@ -22,40 +23,14 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
   final ReservationsService _reservationsService = ReservationsService();
   final CreditsService _creditService = CreditsService();
 
-  final _dateController = TextEditingController();
-  final _timeController = TextEditingController();
+  // Variable para controlar la vista actual (lista o calendario)
+  bool _showCalendar = false;
 
   @override
   void dispose() {
-    _dateController.dispose();
-    _timeController.dispose();
     super.dispose();
   }
 
-  // Dialogo para crear una reserva
-  void _showReservationDialog() async {
-    final DateTime? reservationDateTime = await showDialog<DateTime>(
-      context: context,
-      builder: (BuildContext context) {
-        return const ReservationDialog();
-      },
-    );
-
-    if (reservationDateTime != null) {
-      try {
-        await _reservationsService.createReservation(reservationDateTime);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.reservationCreated)),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppStrings.errorReservation}$e')),
-        );
-      }
-    }
-  }
-
-  // Cancela una reserva //TODO: HAY QUE cambiar la logica de ispending y sacar lo de pendiente a la mierda
   void _handleCancelReservation(Reservation reservation) async {
     Timestamp reservationTime = reservation.date;
     DateTime now = DateTime.now();
@@ -103,12 +78,27 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     }
   }
 
-  // Elimina una reserva
+  void _handleConfirmReservation(Reservation reservation) async {
+    try {
+      await _reservationsService.confirmReservation(reservation);
+      // ignore: duplicate_ignore
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.reservaConfirmada)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${AppStrings.errorAlConfirmar}$e')),
+      );
+    }
+  }
+
   void _handleDeleteReservation(Reservation reservation) async {
     Timestamp reservationTime = reservation.date;
     DateTime now = DateTime.now();
     DateTime reservationDateTime = reservationTime.toDate();
 
+//TODO: Revisar esta logica ya quedo deprecated por los cambios
     if (reservation.isPending || reservation.isCancelled) {
       // Pendiente o Cancelada
       try {
@@ -158,13 +148,25 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
     }
   }
 
-  // Hadler de reservas
   void _handleReservationsOption(String value, Reservation reservation) {
     if (value == 'cancel') {
       _handleCancelReservation(reservation);
     } else if (value == 'delete') {
       _handleDeleteReservation(reservation);
     }
+  }
+
+//TODO: Eliminar esto, solo podríamos apuntarnos a una reserva ya creada, no podemos crear desde el lado del usuario
+  // Muestra el diálogo de creación de reserva
+  void _showReservationDialog() async {
+    // ... (Igual que en `ReservationsScreenAdmin`)
+  }
+
+  // Cambia la vista entre lista y calendario
+  void _toggleView() {
+    setState(() {
+      _showCalendar = !_showCalendar;
+    });
   }
 
   @override
@@ -184,12 +186,26 @@ class _ReservationsScreenState extends State<ReservationsScreen> {
             const SizedBox(height: 20),
             const ReservationsHeader(),
             const SizedBox(height: 10),
-            ReservationsList(
-              reservationsStream: _reservationsService.getUserReservations(),
-              onOptionSelected: (value, reservation) {
-                _handleReservationsOption(value, reservation);
-              },
+            // Botón para cambiar la vista
+            ElevatedButton(
+              onPressed: _toggleView,
+              child: Text(
+                _showCalendar ? 'Ver Lista' : 'Ver Calendario',
+              ),
             ),
+            const SizedBox(height: 10),
+            // Muestra la vista de lista o calendario
+            _showCalendar
+                ? const Center(
+                    child: Text('Calendario'),
+                  )
+                : ReservationsList(
+                    reservationsStream:
+                        _reservationsService.getUserReservations(),
+                    onOptionSelected: (value, reservation) {
+                      _handleReservationsOption(value, reservation);
+                    },
+                  ),
           ],
         ),
       ),

@@ -16,6 +16,10 @@ class AppStrings {
       'No tienes créditos suficientes para confirmar la reserva.';
   static const String errorAlConfirmar = 'Error al confirmar la reserva: ';
 
+  static const String reservaActualizada= 'Reserva actualizada';
+  static const String errorAlActualizar= 'Error al actualizar la reserva.';
+  
+
   static const String reservaCancelada = 'Reserva cancelada';
   static const String reservaCanceladaConRetorno =
       'Reserva cancelada y créditos devueltos';
@@ -41,12 +45,15 @@ class AppStrings {
   static const String beneficios = 'Beneficios';
 
   // Otros
-  static const String confirm = 'confirm';
+  static const String confirm = 'Confirmar';
+
+
   static const String reservas = 'Reservas';
   static const String adminReservas = 'Administrar Reservas';
   static const String agregarCreditos = 'Agregar Creditos';
-  static const String delete = 'delete';
-  static const String cancel = 'cancel';
+  static const String delete = 'Eliminar';
+  static const String cancel = 'Cancelar';
+  static const String error = 'Error';
 
   static const String welcomeMessage = 'Bienvenido a Gym App!';
   static const String loginMessage = 'Por favor inicie sesión!';

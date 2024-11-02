@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservation_tile.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_tile.dart';
 
 class ReservationsList extends StatelessWidget {
   final Stream<List<Reservation>> reservationsStream;
