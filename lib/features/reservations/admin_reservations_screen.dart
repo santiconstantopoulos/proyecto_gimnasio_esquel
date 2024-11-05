@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/new_reservations_button.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/admin_reservations_list.dart';
+import 'package:proyecto_gimnasio_esquel/models/participant.dart';
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_dialog.dart';
@@ -17,11 +18,7 @@ class AdminReservationsScreen extends StatefulWidget {
 class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
   final ReservationsService _reservationsService = ReservationsService();
 
-  //TODO: Agregar logica para ver participantes, confirmar y cancelar reservas de usuarios
-  //TODO: Considedar usar una unica lista de reservas, ver si el usuario es admin o no y mostrar las opciones correspondiente
-  //TODO: Modificar los metodos del sevicio en base a estos cambios
-  //TODO: El admin reservation popup menu tendria que mostrar la opcion de agendarse o cancelar dependiendo si ya esta agendado en una reserva
-
+  // Muestra modal para crear una reserva
   void _showReservationDialog() async {
     final Reservation? newReservation = await showDialog<Reservation>(
       context: context,
@@ -48,6 +45,7 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
     }
   }
 
+  // Muestra a los participantes de una reserva
   void _showParticipantsDialog(Reservation reservation) {
     showDialog(
       context: context,
@@ -56,14 +54,41 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
           title: const Text('Participantes de la reserva'),
           content: SizedBox(
             height: 300,
-            child: ListView.builder(
-              itemCount: reservation.participants.length,
-              itemBuilder: (context, index) {
-                final participant = reservation.participants[index];
-                return ListTile(
-                  title: Text(participant.name),
-                  subtitle: Text('Estado: ${participant.status}'),
-                );
+            width: double.maxFinite,
+            child: StreamBuilder<List<Participant>>(
+              stream: _reservationsService.getParticipants(reservation.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.hasData &&
+                    snapshot.data != null &&
+                    snapshot.data!.isNotEmpty) {
+                  final participants = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: participants.length,
+                    itemBuilder: (context, index) {
+                      final participant = participants[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: participant
+                                  .user.profileImageUrl.isNotEmpty
+                              ? NetworkImage(participant.user.profileImageUrl)
+                              : null,
+                          radius: 20,
+                          child: participant.user.profileImageUrl.isEmpty
+                              ? const Icon(Icons.person)
+                              : null,
+                        ),
+                        title: Text(participant.user.name),
+                        subtitle: Text('Estado: ${participant.status}'),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: Text('No hay participantes.'));
+                }
               },
             ),
           ),
@@ -80,6 +105,7 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
     );
   }
 
+  // Maneja la opcion del popup seleccionada
   void _handleReservationsOption(String option, Reservation reservation) {}
 
   @override
@@ -93,12 +119,13 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
         NewReservationButton(onPressed: _showReservationDialog),
         Expanded(
           child: AdminReservationsList(
-            reservationsStream: _reservationsService.getReservations(),
-            onOptionSelected: (value, reservation) {
-              _handleReservationsOption(value, reservation);
-            },
-            onShowParticipants: _showParticipantsDialog,
-          ),
+              reservationsStream: _reservationsService.getReservations(),
+              onOptionSelected: (value, reservation) {
+                _handleReservationsOption(value, reservation);
+              },
+              onShowParticipants: (reservation) {
+                _showParticipantsDialog(reservation);
+              }),
         ),
       ]),
     );

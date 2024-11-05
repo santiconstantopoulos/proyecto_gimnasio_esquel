@@ -20,23 +20,35 @@ class _UserReservationsScreenState extends State<UserReservationsScreen> {
 
   bool _showCalendar = false;
 
-  //TODO: Agregar logica para agendarse a una reserva, tanto los admins como los usuarios ven las reservas, la diferencia esta en las opciones
-  //TODO: Considedar usar una unica lista de reservas, ver si el usuario es admin o no y mostrar las opciones correspondiente
-  //TODO: Modificar los metodos del sevicio en base a estos cambios
-  //TODO: El user reservation popup menu tendria que mostrar la opcion de agendarse o cancelar dependiendo si ya esta agendado en una reserva
-
+  // Handler para agendar una reserva
   void _handleScheduleUserReservation(Reservation reservation) async {
-    //logica para agendarse a una reserva
-    print('agendarse');
-    print(reservation);
+    try {
+      await _reservationsService.scheduleUserReservation(reservation.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reserva agendada exitosamente.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al agendar la reserva: $e')),
+      );
+    }
   }
 
+  // Handler para cancelar una reserva
   void _handleCancelUserReservation(Reservation reservation) async {
-    //logica para agendarse a una reserva
-    print('cancelar');
-    print(reservation);
+    try {
+      await _reservationsService.cancelUserReservation(reservation.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reserva cancelada exitosamente.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cancelar la reserva: $e')),
+      );
+    }
   }
 
+  // Maneja la opcion del popup seleccionada
   void _handleUserReservationsOption(String value, Reservation reservation) {
     if (value == 'schedule') {
       _handleScheduleUserReservation(reservation);
@@ -45,6 +57,7 @@ class _UserReservationsScreenState extends State<UserReservationsScreen> {
     }
   }
 
+  // Cambia la vista
   void _toggleView() {
     setState(() {
       _showCalendar = !_showCalendar;

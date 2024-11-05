@@ -1,14 +1,16 @@
+import 'package:proyecto_gimnasio_esquel/models/user.dart';
+
 class Participant {
-  final String name;
+  final User user;
   final String status;
 
   Participant({
-    required this.name,
+    required this.user,
     required this.status,
   });
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
+      'user': user,
       'status': status,
     };
   }

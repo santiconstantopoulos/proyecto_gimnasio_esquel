@@ -13,7 +13,7 @@ class ReservationDialog extends StatefulWidget {
 class ReservationDialogState extends State<ReservationDialog> {
   final _formKey = GlobalKey<FormState>();
   final _dateController = TextEditingController();
-  final _timeController = TextEditingController(); // Controlador para la hora
+  final _timeController = TextEditingController();
   final _durationController = TextEditingController();
   final _placesController = TextEditingController();
   DateTime? _selectedStartDate;
@@ -21,7 +21,7 @@ class ReservationDialogState extends State<ReservationDialog> {
   @override
   void dispose() {
     _dateController.dispose();
-    _timeController.dispose(); // Dispose del controlador de hora
+    _timeController.dispose();
     _durationController.dispose();
     _placesController.dispose();
     super.dispose();
@@ -49,7 +49,6 @@ class ReservationDialogState extends State<ReservationDialog> {
     );
     if (picked != null) {
       setState(() {
-        // Convertir TimeOfDay a DateTime
         final now = DateTime.now();
         _selectedStartDate = DateTime(
           _selectedStartDate?.year ?? now.year,
@@ -58,7 +57,7 @@ class ReservationDialogState extends State<ReservationDialog> {
           picked.hour,
           picked.minute,
         );
-        _timeController.text = picked.format(context); // Formatear la hora
+        _timeController.text = picked.format(context);
       });
     }
   }
@@ -75,8 +74,9 @@ class ReservationDialogState extends State<ReservationDialog> {
           fromDate: Timestamp.fromDate(_selectedStartDate!),
           toDate: Timestamp.fromDate(toDate),
           instructorId: 'instructorId',
-          occupiedPlaces: 0,
           places: int.tryParse(_placesController.text) ?? 1,
+          confirmed: 0,
+          pending: 0,
         );
         Navigator.of(context).pop(reservation);
       } else {
@@ -115,7 +115,7 @@ class ReservationDialogState extends State<ReservationDialog> {
             ),
             const SizedBox(height: 20),
             TextFormField(
-              controller: _timeController, // Campo para la hora
+              controller: _timeController,
               decoration: InputDecoration(
                 labelText: 'Hora de Inicio',
                 suffixIcon: IconButton(

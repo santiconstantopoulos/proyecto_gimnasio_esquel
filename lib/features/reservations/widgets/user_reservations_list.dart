@@ -34,7 +34,7 @@ class UserReservationsList extends StatelessWidget {
                   title: Text('Reserva de ${reservation.instructorId}'),
                   subtitle: Text(
                     'Desde: $fromDateFormatted - Hasta: $toDateFormatted\n'
-                    'Lugares: ${reservation.places} - Ocupados: ${reservation.occupiedPlaces}',
+                    'Lugares: ${reservation.places} - Ocupados: ${reservation.confirmed} - Pendientes: ${reservation.pending}',
                   ),
                   trailing: UserReservationsPopupMenu(
                     reservation: reservation,
