@@ -45,6 +45,7 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
     }
   }
 
+  // TODO: Poder confirmar a un usuario, lo que se puede hacer es a participant agregar el userReservation, para pasarselo al service, y que la confirme o cambiar el metodo del service
   // Muestra a los participantes de una reserva
   void _showParticipantsDialog(Reservation reservation) {
     showDialog(
