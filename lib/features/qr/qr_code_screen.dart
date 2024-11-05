@@ -5,14 +5,14 @@ import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/profile_services.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 
-class GenerateQRScreen extends StatefulWidget {
-  const GenerateQRScreen({super.key});
+class QrCodeScreen extends StatefulWidget {
+  const QrCodeScreen({super.key});
 
   @override
-  _GenerateQRScreenState createState() => _GenerateQRScreenState();
+  _QrCodeScreen createState() => _QrCodeScreen();
 }
 
-class _GenerateQRScreenState extends State<GenerateQRScreen> {
+class _QrCodeScreen extends State<QrCodeScreen> {
   final ProfileService _profileService = ProfileService();
   final ReservationsService _reservationsService = ReservationsService();
   final CreditsService _creditsService = CreditsService();
@@ -44,13 +44,17 @@ class _GenerateQRScreenState extends State<GenerateQRScreen> {
       final today = DateTime.now();
       final reservations =
           await _reservationsService.getUserReservations().first;
-      hasReservationToday = reservations.any((reservation) =>
-          reservation.reservationDate.year == today.year &&
-          reservation.reservationDate.month == today.month &&
-          reservation.reservationDate.day == today.day &&
-          reservation.isConfirmed);
+      hasReservationToday = reservations.any((userReservation) {
+        final reservationDate = userReservation.reservation.fromDate.toDate();
+        return reservationDate.year == today.year &&
+            reservationDate.month == today.month &&
+            reservationDate.day == today.day &&
+            userReservation.isConfirmed;
+      });
     } catch (e) {
-      SnackBar(content: Text('Error al verificar la reserva: $e'));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al verificar la reserva: $e')),
+      );
     }
   }
 

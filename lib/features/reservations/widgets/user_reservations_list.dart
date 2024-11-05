@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/user_reservations_popup_menu.dart';
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_popup_menu.dart';
 
-class ReservationsListAdmin extends StatelessWidget {
+class UserReservationsList extends StatelessWidget {
   final Stream<List<Reservation>> reservationsStream;
   final Function(String, Reservation) onOptionSelected;
-  final Function(Reservation) onShowParticipants;
 
-  const ReservationsListAdmin({
+  const UserReservationsList({
     super.key,
     required this.reservationsStream,
     required this.onOptionSelected,
-    required this.onShowParticipants,
   });
 
   @override
@@ -26,23 +25,29 @@ class ReservationsListAdmin extends StatelessWidget {
               itemCount: reservations.length,
               itemBuilder: (context, index) {
                 final reservation = reservations[index];
+                final fromDateFormatted = DateFormat('dd MMMM yyyy HH:mm')
+                    .format(reservation.fromDate.toDate().toLocal());
+                final toDateFormatted = DateFormat('dd MMMM yyyy HH:mm')
+                    .format(reservation.toDate.toDate().toLocal());
+
                 return ListTile(
-                  title: Text(reservation.name),
+                  title: Text('Reserva de ${reservation.instructorId}'),
                   subtitle: Text(
-                      '${reservation.date.toDate().toLocal().toString()} - ${reservation.instructorId}'),
-                  trailing: ReservationPopupMenu(
-                    reservation: reservation,
-                    onOptionSelected: onOptionSelected,
+                    'Desde: $fromDateFormatted - Hasta: $toDateFormatted\n'
+                    'Lugares: ${reservation.places} - Ocupados: ${reservation.occupiedPlaces}',
                   ),
-                  onTap: () {
-                    onShowParticipants(reservation);
-                  }, 
+                  trailing: UserReservationsPopupMenu(
+                    reservation: reservation,
+                    onOptionSelected: (value, reservation) {
+                      onOptionSelected(value, reservation);
+                    },
+                  ),
                 );
               },
             ),
           );
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           return const Center(child: CircularProgressIndicator());
         }

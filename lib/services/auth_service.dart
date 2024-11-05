@@ -13,14 +13,19 @@ class AuthService {
 
   // Obtiene el tipo de usuario
   Future<int> _getUserType() async {
-    String userId = this.userId;
-
     try {
-      DocumentReference<Map<String, dynamic>> profileDoc =
-          _firestore.collection('admins').doc(userId);
+      DocumentReference docRef = _firestore.collection('users').doc(userId);
 
-      DocumentSnapshot<Map<String, dynamic>> adminDoc = await profileDoc.get();
-      return adminDoc.exists ? 0 : 1;
+      DocumentSnapshot docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        String rol = docSnapshot['rol'];
+
+        return rol == 'admin' ? 0 : 1;
+      } else {
+        throw Exception(
+            'El documento del usuario no existe o no contiene el campo rol');
+      }
     } catch (e) {
       throw Exception('Error al obtener el tipo de usuario: $e');
     }

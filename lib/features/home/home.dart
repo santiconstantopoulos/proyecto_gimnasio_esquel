@@ -4,9 +4,9 @@ import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/credits/credits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/qr/qr_code_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/user_reservations_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/menu/menu_screen.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/reservations_screen_admin.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/admin_reservations_screen.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,8 +22,8 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isAdmin = false;
   bool _loading = true;
 
-  final Icon _qrIcon = const Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)); 
-
+  final Icon _qrIcon = const Icon(Icons.qr_code,
+      size: 30, color: Color.fromARGB(255, 255, 187, 0));
 
   @override
   void initState() {
@@ -44,17 +44,17 @@ class _HomeScreenState extends State<HomeScreen>
   // ... (aca ifia el código para actualizar el icono pero no lo tenemos decidido todavia)
 
   final List<Widget> _userScreens = [
-    const ReservationsScreen(),
+    const UserReservationsScreen(),
+    const QrCodeScreen(),
     const NotificationsScreen(),
-    const GenerateQRScreen(),
     const Center(child: Text(AppStrings.beneficios)),
     const MenuScreen(),
   ];
 
   final List<Widget> _adminScreens = [
-    const ReservationsScreenAdmin(),
+    const AdminReservationsScreen(),
+    const QrCodeScreen(),
     const NotificationsScreen(),
-    const GenerateQRScreen(),
     const CreditsScreen(),
     const MenuScreen(),
   ];
@@ -62,10 +62,13 @@ class _HomeScreenState extends State<HomeScreen>
   // Íconos para usuarios normales y administradores (solo un listado ahora)
   final List<Widget> _icons = const <Widget>[
     Icon(Icons.home, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-    Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)), //  icono QR
+    Icon(Icons.qr_code,
+        size: 30, color: Color.fromARGB(255, 255, 187, 0)), //  icono QR
     Icon(Icons.notifications,
         size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-    Icon(Icons.money, size: 30, color: Color.fromARGB(255, 255, 187, 0)), //  icono de créditos
+    Icon(Icons.money,
+        size: 30,
+        color: Color.fromARGB(255, 255, 187, 0)), //  icono de créditos
     Icon(Icons.menu, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
   ];
 
@@ -81,24 +84,24 @@ class _HomeScreenState extends State<HomeScreen>
       body: _isAdmin
           ? _adminScreens[_selectedIndex]
           : _userScreens[_selectedIndex],
-              bottomNavigationBar: CurvedNavigationBar(
-              index: _selectedIndex,
-              height: 50,
-              items: _icons,
-              onTap: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                  // Si se selecciona el botón QR, navega a GenerateQRPage solo si está habilitado
-                  if (index == 1 && _qrIcon.icon == Icons.qr_code) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const GenerateQRScreen(),
-                      ),
-                    );
-                  }
-                    });
-                  },
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _selectedIndex,
+        height: 50,
+        items: _icons,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+            // Si se selecciona el botón QR, navega a GenerateQRPage solo si está habilitado
+            if (index == 1 && _qrIcon.icon == Icons.qr_code) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const QrCodeScreen(),
+                ),
+              );
+            }
+          });
+        },
         color: const Color.fromARGB(255, 54, 32, 68),
         backgroundColor: Colors.white,
         animationDuration: const Duration(milliseconds: 300),
