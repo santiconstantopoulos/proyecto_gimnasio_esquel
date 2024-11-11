@@ -4,7 +4,7 @@ import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 
 class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({Key? key}) : super(key: key);
+  const CalendarScreen({super.key});
 
   @override
   _CalendarScreenState createState() => _CalendarScreenState();
@@ -65,6 +65,6 @@ class MeetingDataSource extends CalendarDataSource {
 
   @override
   bool isAllDay(int index) {
-    return false; // Asumiendo que las reservas no son de día completo
+    return false;
   }
 }

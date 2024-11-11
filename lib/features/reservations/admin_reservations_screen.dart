@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/new_reservations_button.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/admin_reservations_list.dart';
 import 'package:proyecto_gimnasio_esquel/models/participant.dart';
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_dialog.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_calendar_screen.dart';
 
 class AdminReservationsScreen extends StatefulWidget {
   const AdminReservationsScreen({super.key});
@@ -18,7 +18,6 @@ class AdminReservationsScreen extends StatefulWidget {
 class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
   final ReservationsService _reservationsService = ReservationsService();
 
-  // Muestra modal para crear una reserva
   void _showReservationDialog() async {
     final Reservation? newReservation = await showDialog<Reservation>(
       context: context,
@@ -34,7 +33,7 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
           newReservation.toDate,
           newReservation.places,
           className: newReservation.className,
-          instructorId: newReservation.instructorId, // Agrega el ID del instructor
+          instructorId: newReservation.instructorId,
           confirmed: 0,
           pending: 0,
           occupiedPlaces: 0,
@@ -51,8 +50,6 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
     }
   }
 
-  // TODO: Poder confirmar a un usuario, lo que se puede hacer es a participant agregar el userReservation, para pasarselo al service, y que la confirme o cambiar el metodo del service
-  // Muestra a los participantes de una reserva
   void _showParticipantsDialog(Reservation reservation) {
     showDialog(
       context: context,
@@ -112,9 +109,6 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
     );
   }
 
-  // Maneja la opcion del popup seleccionada
-  void _handleReservationsOption(String option, Reservation reservation) {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,19 +116,15 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
         title: const Text(AppStrings.adminReservas),
         centerTitle: true,
       ),
-      body: Column(children: [
-        NewReservationButton(onPressed: _showReservationDialog),
-        Expanded(
-          child: AdminReservationsList(
-              reservationsStream: _reservationsService.getReservations(),
-              onOptionSelected: (value, reservation) {
-                _handleReservationsOption(value, reservation);
-              },
-              onShowParticipants: (reservation) {
-                _showParticipantsDialog(reservation);
-              }),
-        ),
-      ]),
+      body: Column(
+        children: [
+          NewReservationButton(onPressed: _showReservationDialog),
+          const Expanded(
+            child: CalendarScreen(
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

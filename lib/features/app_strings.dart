@@ -1,5 +1,4 @@
 class AppStrings {
-  // TODO organizar correctamente todos los textos
 
   // Login
   static const String confirmLogoutTitle = '¿Estás seguro?';

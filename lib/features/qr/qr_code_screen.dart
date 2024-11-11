@@ -25,8 +25,6 @@ class _QrCodeScreen extends State<QrCodeScreen> {
     _loadCurrentUser();
   }
 
-//TODO: Agregar los App Strings
-
   Future<void> _loadCurrentUser() async {
     try {
       final userDoc = await _profileService.getUserProfile();

@@ -225,7 +225,6 @@ class ReservationsService {
         });
       });
     } catch (e) {
-      print(e);
       throw Exception('No se pudo agendar la reserva. Intente nuevamente.');
     }
   }
