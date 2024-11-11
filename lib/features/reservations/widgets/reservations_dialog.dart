@@ -76,7 +76,8 @@ class ReservationDialogState extends State<ReservationDialog> {
           instructorId: 'instructorId',
           places: int.tryParse(_placesController.text) ?? 1,
           confirmed: 0,
-          pending: 0,
+          pending: 0, 
+          className: '',
         );
         Navigator.of(context).pop(reservation);
       } else {

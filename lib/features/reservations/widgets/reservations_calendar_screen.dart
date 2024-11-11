@@ -1,199 +1,207 @@
-/* import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/credits_display.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/new_reservations_button.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_dialog.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_list.dart';
-import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_list_admin.dart';
+import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/reservations_dialog.dart'; // Puede ser un dialogo de tipo "modal bottom sheet" de Flutter
+import 'package:proyecto_gimnasio_esquel/models/participant.dart';
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
-import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/credits_service.dart';
-import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:random/random.dart';
- */
-/* class ReservationsScreenAdmin extends StatefulWidget {
-  const ReservationsScreenAdmin({super.key});
+
+class ReservationsCalendarScreen extends StatefulWidget {
+  final bool isAdmin;
+
+  const ReservationsCalendarScreen({super.key, required this.isAdmin});
 
   @override
-  State<ReservationsScreenAdmin> createState() =>
-      _ReservationsScreenAdminState();
-} */
+  State<ReservationsCalendarScreen> createState() =>
+      _ReservationsCalendarScreenState();
+}
 
-/*class _ReservationsScreenAdminState extends State<ReservationsScreenAdmin> {
+class _ReservationsCalendarScreenState
+    extends State<ReservationsCalendarScreen> {
   final ReservationsService _reservationsService = ReservationsService();
   final CreditsService _creditsService = CreditsService();
 
-  // Mapa para asociar un color a cada tipo de clase
   final Map<String, Color> _classColors = {
     'Funcional': Colors.green,
     'Musculación': Colors.brown,
     'Yoga': Colors.red,
-    // Agrega más clases y colores según tus necesidades
   };
+  
+  //  Estados para el calendario:
+  CalendarFormat _calendarFormat = CalendarFormat.week; // Formato semanal
+  DateTime _focusedDay = DateTime.now(); // Día actual
+  DateTime _selectedDay = DateTime.now(); // Día actual 
+  List<Reservation> _reservations = []; //  Lista de reservas
 
-  // Estado del calendario
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _selectedDate = DateTime.now();
-  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
-      .toggledOff; // Opción para seleccionar un rango de fechas
+  //  Para manejo de reservas:
+  void _showReservationDialog() {
+  showDialog(
+  context: context,
+  builder: (context) {
+    return const ReservationDialog( 
+        );
+            Navigator.of(context).pop();
+          },
+        );
+  }
 
-  // Estado de la lista de reservas
-  List<Reservation> _reservations = [];
+  //  Mostrar  la lista de participantes  
+  void _handleReservationClick(Reservation reservation) {
+    //   Mostrar el dialogo  de  detalles  de la reserva: 
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(reservation.className),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  'Fecha: ${reservation.fromDate.toDate().toLocal()} - ${reservation.toDate.toDate().toLocal()}'),
+              Text('Instructor: ${reservation.instructorId}'), 
+              Text('Cupo: ${reservation.places}'),
+              const SizedBox(height: 16),
+              Text('Estado: ${reservation.status}'),
+              const SizedBox(height: 16),
+              const Text('Participantes:'),
+              StreamBuilder<List<Participant>>(
+                stream: _reservationsService.getParticipants(reservation.id),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData &&
+                      snapshot.data != null &&
+                      snapshot.data!.isNotEmpty) {
+                    final participants = snapshot.data!;
+                    return SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: participants.length,
+                        itemBuilder: (context, index) {
+                          final participant = participants[index];
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage: participant.user.profileImageUrl.isNotEmpty ? NetworkImage(participant.user.profileImageUrl) : null,
+                              radius: 20,
+                              child: participant.user.profileImageUrl.isEmpty ? const Icon(Icons.person) : null,
+                            ),
+                            title: Text(participant.user.name),
+                            subtitle: Text('Estado: ${participant.status}'),
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return const Center(child: Text('No hay participantes.'));
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
     super.initState();
 
-    _reservationsService.getUserReservations().listen((reservations) {
+    _reservationsService.getReservations().listen((reservations) {
       setState(() {
         _reservations = reservations;
       });
     });
   }
 
-  // Actualiza la lista de reservas al cambiar el mes
+  // Actualiza el calendario cuando  cambia el mes 
   void _onCalendarChanged(DateTime date) {
     setState(() {
-      _selectedDate = date;
+      _focusedDay = date;
     });
   }
 
-  // Crea un nuevo diálogo para agregar una reserva
-  void _showReservationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return ReservationDialog(
-          // Pasa los parámetros necesarios al diálogo
-          onSubmit: (dateTime, name, instructorId, capacity, participants) {
-            // Guarda la nueva reserva en la base de datos
-            _reservationsService.createReservation(
-              dateTime,
-              name: name,
-              instructorId: instructorId,
-              capacity: capacity,
-              participants: participants,
-            );
-            // Cierra el diálogo
-            Navigator.of(context).pop();
-          },
-        );
-      },
-    );
+  //  Lista de eventos (reservas):
+  List<Appointment> _getCalendarEvents() {
+    List<Appointment> calendarAppointments = [];
+    for (var reservation in _reservations) {
+      //  Obtener datos del instructor, etc.
+      String? className = reservation.className;
+      String? instructorId = reservation.instructorId;
+      Color? color = _classColors[className] ?? Colors.blue;
+
+      Appointment calendarAppointment = Appointment(
+        startTime: reservation.fromDate.toDate(),
+        isAllDay: true, //  Para mostrar la reserva durante todo el día
+        notes: 'Instructor: ${reservation.instructorId}',
+        color: color, 
+        subject: reservation.className, // Nombre de la clase 
+        endTime: reservation.fromDate.toDate().add(const Duration(hours: 2)), //  Fecha de inicio 
+      );
+
+      calendarAppointments.add(calendarAppointment);
+    }
+    
+    return calendarAppointments;
   }
 
-  // Función para manejar el clic en la reserva
-  void _handleReservationClick(Reservation reservation) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          // ... (Implementa los detalles del diálogo de la reserva)
-        );
-      },
-    );
-  }
-
-  // Función para manejar el arrastre y soltar de la reserva
-  void _handleReservationDrag(Reservation reservation) {
-    // ... (Implementa la lógica para el arrastre y soltar)
-  }
-
+  //   Widget para mostrar el calendario y lista de eventos:
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.adminReservas),
+        title: const Text(AppStrings.reservas),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Widget para mostrar los créditos del usuario
+            // Widget para mostrar los créditos del usuario 
             CreditsDisplay(creditsStream: _creditsService.getUserCredits()),
             const SizedBox(height: 20),
-            // Widget para crear una nueva reserva
-            NewReservationButton(onPressed: _showReservationDialog),
+            //  Botón para crear una reserva. 
+            if (widget.isAdmin)
+              NewReservationButton(onPressed: _showReservationDialog), 
             const SizedBox(height: 20),
-            // Widget para mostrar el calendario
-            TableCalendar(
-              calendarFormat: _calendarFormat,
-              selectedDate: _selectedDate,
-              rangeSelectionMode: _rangeSelectionMode,
-              onCalendarChanged: _onCalendarChanged,
-              headerVisible: true,
-              calendarBuilders: CalendarBuilders(
-                selectedDayBuilder: (context, date, isSelectable) =>
-                    Container(
-                      decoration: BoxDecoration(
-                        color: _classColors[date.toString()],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      // ... (Muestra el nombre de la clase)
-                    ),
-                todayDayBuilder: (context, date, isSelectable) => Container(
-                  // ... (Muestra la fecha actual)
-                ),
-                outsideDayBuilder: (context, date, isSelectable) => Container(
-                  // ... (Muestra las fechas fuera del mes actual)
-                ),
-                defaultDayBuilder: (context, date, isSelectable) => Container(
-                  // ... (Muestra el día del mes)
-                ),
-                weekendDayBuilder: (context, date, isSelectable) => Container(
-                  // ... (Muestra los días de fin de semana)
-                ),
-              ),
-              availableGestures: AvailableGestures.all,
-              onPageChanged: (format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDate = selectedDay;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            // Widget para mostrar la lista de reservas
+
             Expanded(
-              child: StreamBuilder<List<Reservation>>(
-                stream: _reservationsService.getUserReservations(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final reservations = snapshot.data!;
-                    // Filtra las reservas por fecha
-                    final filteredReservations = reservations
-                        .where((reservation) =>
-                            reservation.date.toDate().month ==
-                            _selectedDate.month &&
-                            reservation.date.toDate().year ==
-                            _selectedDate.year)
-                        .toList();
-                    return ReservationsListAdmin(
-                      reservations: filteredReservations,
-                      onOptionSelected: (value, reservation) {
-                        // ... (Maneja las acciones del usuario)
-                      },
-                      onShowParticipants: (reservation) {
-                        // ... (Muestra el diálogo de participantes)
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('${AppStrings.error} ${snapshot.error}'),
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+              child:  //  Calendario con eventos de reserva 
+              SfCalendar(
+                view: CalendarView.week, 
+                firstDayOfWeek: 1, 
+                headerStyle: const CalendarHeaderStyle(
+                  textAlign: TextAlign.center, 
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.w500, 
+                    fontSize: 16.0,
+                    color: Colors.black87 
+                  ),
+                ),
+                initialDisplayDate: DateTime.now(),
+                allowedViews: const [CalendarView.day, CalendarView.week, CalendarView.month],
+                controller: CalendarController(), 
+                onTap: (CalendarTapDetails details) {
+                  _showReservationDialog(); 
+                },
+                onLongPress: (details) {
+                  //   Manejo de gestos de presión larga  
                 },
               ),
             ),
@@ -202,4 +210,4 @@ import 'package:random/random.dart';
       ),
     );
   }
-}*/
+}

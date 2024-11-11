@@ -10,6 +10,7 @@ class Reservation {
   final int places;
   final int confirmed;
   final int pending;
+  final String className;
   final List<Participant> participants = [];
 
   Reservation({
@@ -21,6 +22,7 @@ class Reservation {
     required this.places,
     required this.confirmed,
     required this.pending,
+    required this.className
   });
 
   factory Reservation.fromFirestore(String id, Map<String, dynamic> data) {
@@ -32,6 +34,7 @@ class Reservation {
         instructorId: data['instructor_id'] as String,
         places: data['places'] as int,
         confirmed: data['confirmed'] as int,
-        pending: data['pending']);
+        pending: data['pending'],
+        className: data['className']);
   }
 }

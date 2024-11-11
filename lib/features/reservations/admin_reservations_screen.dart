@@ -33,6 +33,12 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
           newReservation.fromDate,
           newReservation.toDate,
           newReservation.places,
+          className: newReservation.className,
+          instructorId: newReservation.instructorId, // Agrega el ID del instructor
+          confirmed: 0,
+          pending: 0,
+          occupiedPlaces: 0,
+          status: 0,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text(AppStrings.reservationCreated)),

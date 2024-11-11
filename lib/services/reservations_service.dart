@@ -65,7 +65,10 @@ class ReservationsService {
 
   // El admin crea una reserva
   Future<void> createReservation(
-      Timestamp fromDate, Timestamp toDate, int places) async {
+      Timestamp fromDate, Timestamp toDate, int places, {
+    String? className,
+    required String instructorId, required int confirmed, required int pending, required int status, required int occupiedPlaces,
+  }) async {
     try {
       await _firestore.collection('reservations').add({
         'from_date': fromDate,
@@ -75,7 +78,8 @@ class ReservationsService {
         'pending': 0,
         'occupied_places': 0,
         'status': 0,
-        'instructor_id': '', // ID del instructor, si se aplica
+        'instructor_id': instructorId,
+        'className': className,
         'created_date': Timestamp.now(),
       });
 
