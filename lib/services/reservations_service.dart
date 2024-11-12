@@ -65,9 +65,15 @@ class ReservationsService {
 
   // El admin crea una reserva
   Future<void> createReservation(
-      Timestamp fromDate, Timestamp toDate, int places, {
+    Timestamp fromDate,
+    Timestamp toDate,
+    int places, {
     String? className,
-    required String instructorId, required int confirmed, required int pending, required int status, required int occupiedPlaces,
+    required String instructorId,
+    required int confirmed,
+    required int pending,
+    required int status,
+    required int occupiedPlaces,
   }) async {
     try {
       await _firestore.collection('reservations').add({
@@ -79,7 +85,7 @@ class ReservationsService {
         'occupied_places': 0,
         'status': 0,
         'instructor_id': instructorId,
-        'className': className,
+        'class_name': className,
         'created_date': Timestamp.now(),
       });
 
@@ -194,6 +200,7 @@ class ReservationsService {
 
         int currentPending = reservationSnapshot['pending'] as int;
         int totalPlaces = reservationSnapshot['places'] as int;
+        int currentConfirmed = reservationSnapshot['confirmed'] as int;
 
         QuerySnapshot existingReservationSnapshot = await _firestore
             .collection('user_reservations')
@@ -207,18 +214,21 @@ class ReservationsService {
           throw Exception('El usuario ya está agendado a esta reserva.');
         }
 
-        if (currentPending >= totalPlaces) {
-          throw Exception('No hay lugares disponibles para esta reserva.');
+        bool isConfirmed = currentConfirmed < totalPlaces;
+        if (isConfirmed) {
+          transaction.update(reservationRef, {
+            'confirmed': currentConfirmed + 1,
+          });
+        } else {
+          transaction.update(reservationRef, {
+            'pending': currentPending + 1,
+          });
         }
-
-        transaction.update(reservationRef, {
-          'pending': currentPending + 1,
-        });
 
         transaction.set(_firestore.collection('user_reservations').doc(), {
           'user_id': _authService.userId,
           'reservation_id': reservationId,
-          'status': 0, // Estatus de "pendiente"
+          'status': isConfirmed ? 1 : 0,
           'is_deleted': false,
           'is_periodic': false,
           'created_date': Timestamp.now(),
@@ -227,6 +237,21 @@ class ReservationsService {
     } catch (e) {
       throw Exception('No se pudo agendar la reserva. Intente nuevamente.');
     }
+  }
+
+  // Obtiene el estado de la reserva del usuario
+  Future<int?> getUserReservationStatus(String reservationId) async {
+    final QuerySnapshot snapshot = await _firestore
+        .collection('user_reservations')
+        .where('reservation_id', isEqualTo: reservationId)
+        .where('user_id', isEqualTo: _authService.userId)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first['status'] as int;
+    }
+    return null;
   }
 
   // El admin confirma una reserva de un usurio
@@ -267,7 +292,7 @@ class ReservationsService {
     }
   }
 
-  // El usuario cancela su reserva
+// El usuario cancela su reserva
   Future<void> cancelUserReservation(String reservationId) async {
     try {
       await _firestore.runTransaction((transaction) async {
@@ -308,6 +333,31 @@ class ReservationsService {
         transaction.update(userReservationSnapshot.docs.first.reference, {
           'status': 2, // Cancelado
         });
+
+        QuerySnapshot pendingReservations = await _firestore
+            .collection('user_reservations')
+            .where('reservation_id', isEqualTo: reservationId)
+            .where('status', isEqualTo: 0)
+            .orderBy('created_date')
+            .limit(1)
+            .get();
+
+        if (pendingReservations.docs.isNotEmpty) {
+          DocumentReference firstPendingReservationRef =
+              pendingReservations.docs.first.reference;
+
+          transaction.update(firstPendingReservationRef, {
+            'status': 1, // Confirmado
+          });
+
+          DocumentReference reservationRefToUpdate =
+              _firestore.collection('reservations').doc(reservationId);
+
+          transaction.update(reservationRefToUpdate, {
+            'pending': currentPending - 1,
+            'confirmed': currentConfirmed + 1,
+          });
+        }
       });
     } catch (e) {
       throw Exception('No se pudo cancelar la reserva. Intente nuevamente.');

@@ -2,16 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_gimnasio_esquel/features/reservations/widgets/user_reservations_popup_menu.dart';
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
+import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 
 class UserReservationsList extends StatelessWidget {
   final Stream<List<Reservation>> reservationsStream;
+  final ReservationsService _reservationsService;
   final Function(String, Reservation) onOptionSelected;
 
-  const UserReservationsList({
+  UserReservationsList({
     super.key,
     required this.reservationsStream,
     required this.onOptionSelected,
-  });
+    ReservationsService? reservationsService,
+  }) : _reservationsService = reservationsService ?? ReservationsService();
+
+  Future<Color> _getReservationStatusColor(String reservationId) async {
+    final userReservationStatus =
+        await _reservationsService.getUserReservationStatus(reservationId);
+
+    switch (userReservationStatus) {
+      case 1: // Confirmado
+        return Colors.green;
+      case 0: // Pendiente
+        return Colors.yellow;
+      case 2: // Cancelado
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,18 +49,45 @@ class UserReservationsList extends StatelessWidget {
                 final toDateFormatted = DateFormat('dd MMMM yyyy HH:mm')
                     .format(reservation.toDate.toDate().toLocal());
 
-                return ListTile(
-                  title: Text('Reserva de ${reservation.instructorId}'),
-                  subtitle: Text(
-                    'Desde: $fromDateFormatted - Hasta: $toDateFormatted\n'
-                    'Lugares: ${reservation.places} - Ocupados: ${reservation.confirmed} - Pendientes: ${reservation.pending}',
-                  ),
-                  trailing: UserReservationsPopupMenu(
-                    reservation: reservation,
-                    onOptionSelected: (value, reservation) {
-                      onOptionSelected(value, reservation);
-                    },
-                  ),
+                return FutureBuilder<Color>(
+                  future: _getReservationStatusColor(reservation.id),
+                  builder: (context, colorSnapshot) {
+                    final statusColor = colorSnapshot.data ?? Colors.grey;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 70,
+                            color: statusColor,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Reserva de ${reservation.instructorId}',
+                                ),
+                                Text(
+                                  'Desde: $fromDateFormatted - Hasta: $toDateFormatted\n'
+                                  'Lugares: ${reservation.places} - Ocupados: ${reservation.confirmed} - Pendientes: ${reservation.pending}',
+                                ),
+                              ],
+                            ),
+                          ),
+                          UserReservationsPopupMenu(
+                            reservation: reservation,
+                            onOptionSelected: (value, reservation) {
+                              onOptionSelected(value, reservation);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               },
             ),

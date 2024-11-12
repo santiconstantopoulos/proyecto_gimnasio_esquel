@@ -27,7 +27,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               view: CalendarView.month,
               dataSource: MeetingDataSource(reservations),
               monthViewSettings: const MonthViewSettings(
-                  appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
+                  appointmentDisplayMode:
+                      MonthAppointmentDisplayMode.appointment),
             );
           } else {
             return const Center(child: CircularProgressIndicator());

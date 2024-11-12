@@ -120,8 +120,7 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
         children: [
           NewReservationButton(onPressed: _showReservationDialog),
           const Expanded(
-            child: CalendarScreen(
-            ),
+            child: CalendarScreen(),
           ),
         ],
       ),
