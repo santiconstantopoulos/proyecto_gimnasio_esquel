@@ -34,23 +34,23 @@ class CalendarScreen extends StatelessWidget {
 }
 
 class MeetingDataSource extends CalendarDataSource {
-  MeetingDataSource(this.reservations);
-
-  final List<Reservation> reservations;
+  MeetingDataSource(List<Reservation> source) {
+    appointments = source;
+  }
 
   @override
   DateTime getStartTime(int index) {
-    return reservations[index].fromDate.toDate().toLocal();
+    return appointments![index].fromDate.toDate().toLocal();
   }
 
   @override
   DateTime getEndTime(int index) {
-    return reservations[index].toDate.toDate().toLocal();
+    return appointments![index].toDate.toDate().toLocal();
   }
 
   @override
   String getSubject(int index) {
-    return reservations[index].className;
+    return appointments![index].className;
   }
 
   @override
