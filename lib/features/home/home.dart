@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
+import 'package:proyecto_gimnasio_esquel/features/benefits/benefits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/credits/credits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/qr/qr_code_screen.dart';
@@ -40,14 +41,11 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  // Función para actualizar el icono del QR. Si el usuario tiene una reserva para hoy, se muestra el icono de QR, si no, se muestra en gris
-  // ... (aca ifia el código para actualizar el icono pero no lo tenemos decidido todavia)
-
   final List<Widget> _userScreens = [
     const UserReservationsScreen(),
     const QrCodeScreen(),
     const NotificationsScreen(),
-    const Center(child: Text(AppStrings.beneficios)),
+    const BenefitsScreen(),
     const MenuScreen(),
   ];
 
