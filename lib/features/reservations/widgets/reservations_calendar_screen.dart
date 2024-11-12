@@ -1,30 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:proyecto_gimnasio_esquel/models/reservation.dart';
-import 'package:proyecto_gimnasio_esquel/services/reservations_service.dart';
 
-class CalendarScreen extends StatefulWidget {
-  const CalendarScreen({super.key});
+class CalendarScreen extends StatelessWidget {
+  final Stream<List<Reservation>> reservationsStream;
 
-  @override
-  _CalendarScreenState createState() => _CalendarScreenState();
-}
-
-class _CalendarScreenState extends State<CalendarScreen> {
-  final ReservationsService _reservationsService = ReservationsService();
+  const CalendarScreen({super.key, required this.reservationsStream});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<List<Reservation>>(
-        stream: _reservationsService.getReservations(),
+        stream: reservationsStream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             List<Reservation> reservations = snapshot.data!;
             return SfCalendar(
-              view: CalendarView.month,
+              view: CalendarView.workWeek,
               dataSource: MeetingDataSource(reservations),
               monthViewSettings: const MonthViewSettings(
                   appointmentDisplayMode:
@@ -46,12 +40,12 @@ class MeetingDataSource extends CalendarDataSource {
 
   @override
   DateTime getStartTime(int index) {
-    return reservations[index].fromDate.toDate();
+    return reservations[index].fromDate.toDate().toLocal();
   }
 
   @override
   DateTime getEndTime(int index) {
-    return reservations[index].toDate.toDate();
+    return reservations[index].toDate.toDate().toLocal();
   }
 
   @override

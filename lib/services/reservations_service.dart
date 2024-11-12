@@ -7,6 +7,8 @@ import 'package:proyecto_gimnasio_esquel/models/user_reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
 
+//TODO: sacar transaccion
+
 class ReservationsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
@@ -292,7 +294,7 @@ class ReservationsService {
     }
   }
 
-// El usuario cancela su reserva
+  // El usuario cancela su reserva
   Future<void> cancelUserReservation(String reservationId) async {
     try {
       await _firestore.runTransaction((transaction) async {
@@ -361,6 +363,54 @@ class ReservationsService {
       });
     } catch (e) {
       throw Exception('No se pudo cancelar la reserva. Intente nuevamente.');
+    }
+  }
+
+  // Obtiene la reserva de un usuario por su código QR
+  Future<Reservation?> getReservationByQrCode(String qrCode) async {
+    try {
+      // Obtén la información del usuario a partir del código QR
+      // (Asumiendo que el código QR es el ID del usuario)
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(qrCode)
+          .collection('profile')
+          .doc('profile_data')
+          .get();
+
+      if (!userDoc.exists) {
+        return null; // El usuario no existe
+      }
+
+      // Obtén la última reserva confirmada del usuario
+      final userReservationsSnapshot = await _firestore
+          .collection('user_reservations')
+          .where('user_id', isEqualTo: qrCode)
+          .where('status', isEqualTo: 1) // Confirmada
+          .orderBy('created_date', descending: true) // La más reciente
+          .limit(1)
+          .get();
+
+      if (userReservationsSnapshot.docs.isEmpty) {
+        return null; // No hay reservas confirmadas
+      }
+      final userReservationDoc = userReservationsSnapshot.docs.first;
+      final reservationId = userReservationDoc['reservation_id'];
+
+      // Obtén la reserva por su ID
+      final reservationDoc =
+          await _firestore.collection('reservations').doc(reservationId).get();
+
+      if (reservationDoc.exists) {
+        return Reservation.fromFirestore(
+          reservationDoc.id,
+          reservationDoc.data()!,
+        );
+      } else {
+        return null; // La
+      }
+    } catch (e) {
+      return null;
     }
   }
 }
