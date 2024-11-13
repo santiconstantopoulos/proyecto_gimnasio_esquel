@@ -21,7 +21,12 @@ class NotificationsService {
       QuerySnapshot<Map<String, dynamic>> snapshot =
           await notificationsCollection.get();
 
-      return snapshot.docs.map((doc) => doc.data()).toList();
+      return snapshot.docs
+          .map((doc) => {
+                'id': doc.id,
+                ...doc.data(),
+              })
+          .toList();
     } catch (e) {
       await _logService.createUserLog('Error al cargar las notificaciones: $e',
           'error', 'notifications_service');
@@ -29,7 +34,7 @@ class NotificationsService {
     }
   }
 
-  // Crea una notificación
+  // Crea una notificación para el usuario logeado
   Future<void> createNotification(String title, String message) async {
     try {
       await _firestore
@@ -50,6 +55,34 @@ class NotificationsService {
       await _logService.createUserLog('Error al crear la notificación: $e',
           'error', 'notifications_service');
       throw Exception('Error crear la notificación: $e');
+    }
+  }
+
+  // Crea una notificación para un usuario específico
+  Future<void> createNotificationForUser(
+      String userId, String title, String message) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('notifications')
+          .add({
+        'title': title,
+        'message': message,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      await _logService.createUserLog(
+          'Notificación creada para $userId con título "$title"',
+          'info',
+          'notifications_service');
+    } catch (e) {
+      await _logService.createUserLog(
+          'Error al crear la notificación para el usuario $userId: $e',
+          'error',
+          'notifications_service');
+      throw Exception(
+          'Error crear la notificación para el usuario $userId: $e');
     }
   }
 

@@ -6,13 +6,13 @@ import 'package:proyecto_gimnasio_esquel/models/user.dart';
 import 'package:proyecto_gimnasio_esquel/models/user_reservation.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/log_service.dart';
-
-//TODO: sacar transaccion
+import 'package:proyecto_gimnasio_esquel/services/notifications_service.dart';
 
 class ReservationsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
   final LogService _logService = LogService();
+  final NotificationsService _notificationsService = NotificationsService();
 
   // Obtiene todas las reservas
   Stream<List<Reservation>> getReservations() {
@@ -75,7 +75,6 @@ class ReservationsService {
     required int confirmed,
     required int pending,
     required int status,
-    required int occupiedPlaces,
   }) async {
     try {
       await _firestore.collection('reservations').add({
@@ -84,7 +83,6 @@ class ReservationsService {
         'places': places,
         'confirmed': 0,
         'pending': 0,
-        'occupied_places': 0,
         'status': 0,
         'instructor_id': instructorId,
         'class_name': className,
@@ -103,27 +101,27 @@ class ReservationsService {
   }
 
   // El admin elimina una reserva
-  Future<void> deleteReservation(Reservation reservation) async {
+  Future<void> deleteReservation(String reservationId) async {
     try {
       await _firestore
           .collection('reservations')
-          .doc(reservation.id)
+          .doc(reservationId)
           .update({'is_deleted': true});
 
       await _logService.createUserLog(
-          'Reserva ${reservation.id} marcada como eliminada',
+          'Reserva $reservationId marcada como eliminada',
           'info',
           'reservations_service');
     } catch (e) {
       await _logService.createUserLog(
-          'Error al eliminar la reserva ${reservation.id}: $e',
+          'Error al eliminar la reserva $reservationId: $e',
           'error',
           'reservations_service');
       throw Exception('Error al eliminar la reserva: $e');
     }
   }
 
-  // Obtiene las reservas del usuario
+  // Obtiene las reservas del usuario (user_reservations)
   Stream<List<UserReservation>> getUserReservations() {
     return _firestore
         .collection('user_reservations')
@@ -189,45 +187,42 @@ class ReservationsService {
   // El usuario se agenda a una reserva
   Future<void> scheduleUserReservation(String reservationId) async {
     try {
-      await _firestore.runTransaction((transaction) async {
-        DocumentReference reservationRef =
-            _firestore.collection('reservations').doc(reservationId);
+      DocumentReference reservationRef =
+          _firestore.collection('reservations').doc(reservationId);
+      DocumentSnapshot reservationSnapshot = await reservationRef.get();
 
-        DocumentSnapshot reservationSnapshot =
-            await transaction.get(reservationRef);
+      if (!reservationSnapshot.exists) {
+        throw Exception('La reserva no existe.');
+      }
 
-        if (!reservationSnapshot.exists) {
-          throw Exception('La reserva no existe.');
-        }
+      int currentPending = reservationSnapshot['pending'] as int;
+      int totalPlaces = reservationSnapshot['places'] as int;
+      int currentConfirmed = reservationSnapshot['confirmed'] as int;
 
-        int currentPending = reservationSnapshot['pending'] as int;
-        int totalPlaces = reservationSnapshot['places'] as int;
-        int currentConfirmed = reservationSnapshot['confirmed'] as int;
+      QuerySnapshot existingReservationSnapshot = await _firestore
+          .collection('user_reservations')
+          .where('reservation_id', isEqualTo: reservationId)
+          .where('user_id', isEqualTo: _authService.userId)
+          .limit(1)
+          .get();
 
-        QuerySnapshot existingReservationSnapshot = await _firestore
-            .collection('user_reservations')
-            .where('reservation_id', isEqualTo: reservationId)
-            .where('user_id', isEqualTo: _authService.userId)
-            .where('status', isNotEqualTo: 2)
-            .limit(1)
-            .get();
-
-        if (existingReservationSnapshot.docs.isNotEmpty) {
+      bool isConfirmed = currentConfirmed < totalPlaces;
+      if (existingReservationSnapshot.docs.isNotEmpty) {
+        if (existingReservationSnapshot.docs.first['status'] != 2) {
           throw Exception('El usuario ya está agendado a esta reserva.');
         }
 
-        bool isConfirmed = currentConfirmed < totalPlaces;
-        if (isConfirmed) {
-          transaction.update(reservationRef, {
-            'confirmed': currentConfirmed + 1,
-          });
-        } else {
-          transaction.update(reservationRef, {
-            'pending': currentPending + 1,
-          });
-        }
+        await existingReservationSnapshot.docs.first.reference.update({
+          'status': isConfirmed ? 1 : 0, // Confirmado o en espera
+          'created_date': Timestamp.now(),
+        });
 
-        transaction.set(_firestore.collection('user_reservations').doc(), {
+        await reservationRef.update({
+          isConfirmed ? 'confirmed' : 'pending':
+              isConfirmed ? currentConfirmed + 1 : currentPending + 1,
+        });
+      } else {
+        await _firestore.collection('user_reservations').add({
           'user_id': _authService.userId,
           'reservation_id': reservationId,
           'status': isConfirmed ? 1 : 0,
@@ -235,7 +230,21 @@ class ReservationsService {
           'is_periodic': false,
           'created_date': Timestamp.now(),
         });
-      });
+
+        await reservationRef.update({
+          isConfirmed ? 'confirmed' : 'pending':
+              isConfirmed ? currentConfirmed + 1 : currentPending + 1,
+        });
+      }
+
+      String notificationMessage = isConfirmed
+          ? 'Tu reserva ha sido confirmada exitosamente.'
+          : 'Estás en lista de espera para la reserva. Te notificaremos si se confirma tu lugar.';
+      await _notificationsService.createNotificationForUser(
+        _authService.userId,
+        'Reserva Agendada',
+        notificationMessage,
+      );
     } catch (e) {
       throw Exception('No se pudo agendar la reserva. Intente nuevamente.');
     }
@@ -256,39 +265,38 @@ class ReservationsService {
     return null;
   }
 
-  // El admin confirma una reserva de un usurio
+  // El admin confirma una reserva de un usuario
   Future<void> confirmUserReservation(UserReservation reservation) async {
     try {
-      await _firestore.runTransaction((transaction) async {
-        DocumentReference userReservationRef =
-            _firestore.collection('user_reservations').doc(reservation.id);
+      DocumentReference userReservationRef =
+          _firestore.collection('user_reservations').doc(reservation.id);
+      DocumentSnapshot userReservationSnapshot = await userReservationRef.get();
 
-        DocumentSnapshot userReservationSnapshot =
-            await transaction.get(userReservationRef);
+      if (!userReservationSnapshot.exists) {
+        throw Exception('La reserva del usuario no existe.');
+      }
 
-        if (!userReservationSnapshot.exists) {
-          throw Exception('La reserva del usuario no existe.');
-        }
+      int status = userReservationSnapshot['status'];
+      DocumentReference reservationRef =
+          _firestore.collection('reservations').doc(reservation.reservationId);
+      DocumentSnapshot reservationSnapshot = await reservationRef.get();
 
-        int status = userReservationSnapshot['status'];
-        DocumentReference reservationRef = _firestore
-            .collection('reservations')
-            .doc(reservation.reservationId);
-        DocumentSnapshot reservationSnapshot =
-            await transaction.get(reservationRef);
+      int currentPending = reservationSnapshot['pending'] as int;
+      int currentConfirmed = reservationSnapshot['confirmed'] as int;
 
-        int currentPending = reservationSnapshot['pending'] as int;
-        int currentConfirmed = reservationSnapshot['confirmed'] as int;
+      if (status == 0) {
+        await reservationRef.update({
+          'pending': currentPending - 1,
+          'confirmed': currentConfirmed + 1,
+        });
 
-        if (status == 0) {
-          transaction.update(reservationRef, {
-            'pending': currentPending - 1,
-            'confirmed': currentConfirmed + 1,
-          });
-        }
+        await _notificationsService.createNotificationForUser(
+            reservation.userId,
+            'Reserva Confirmada',
+            'Tu reserva ha sido confirmada exitosamente.');
+      }
 
-        transaction.update(userReservationRef, {'status': 1}); // confirmado
-      });
+      await userReservationRef.update({'status': 1}); // confirmado
     } catch (e) {
       throw Exception('Error al confirmar la reserva de usuario: $e');
     }
@@ -297,72 +305,80 @@ class ReservationsService {
   // El usuario cancela su reserva
   Future<void> cancelUserReservation(String reservationId) async {
     try {
-      await _firestore.runTransaction((transaction) async {
-        DocumentReference reservationRef =
-            _firestore.collection('reservations').doc(reservationId);
+      DocumentReference reservationRef =
+          _firestore.collection('reservations').doc(reservationId);
+      DocumentSnapshot reservationSnapshot = await reservationRef.get();
 
-        DocumentSnapshot reservationSnapshot =
-            await transaction.get(reservationRef);
+      if (!reservationSnapshot.exists) {
+        throw Exception('La reserva no existe.');
+      }
 
-        if (!reservationSnapshot.exists) {
-          throw Exception('La reserva no existe.');
-        }
+      int currentPending = reservationSnapshot['pending'] as int;
+      int currentConfirmed = reservationSnapshot['confirmed'] as int;
 
-        int currentPending = reservationSnapshot['pending'] as int;
-        int currentConfirmed = reservationSnapshot['confirmed'] as int;
+      QuerySnapshot userReservationSnapshot = await _firestore
+          .collection('user_reservations')
+          .where('reservation_id', isEqualTo: reservationId)
+          .where('user_id', isEqualTo: _authService.userId)
+          .limit(1)
+          .get();
 
-        QuerySnapshot userReservationSnapshot = await _firestore
-            .collection('user_reservations')
-            .where('reservation_id', isEqualTo: reservationId)
-            .where('user_id', isEqualTo: _authService.userId)
-            .limit(1)
-            .get();
+      if (userReservationSnapshot.docs.isEmpty) {
+        throw Exception('La reserva del usuario no se encuentra.');
+      }
 
-        if (userReservationSnapshot.docs.isEmpty) {
-          throw Exception('La reserva del usuario no se encuentra.');
-        }
+      DocumentSnapshot userReservationDoc = userReservationSnapshot.docs.first;
+      int userReservationStatus = userReservationDoc['status'];
+      if (userReservationStatus != 0 && userReservationStatus != 1) {
+        throw Exception(
+            'Solo se pueden cancelar reservas pendientes o confirmadas.');
+      }
 
-        if (currentPending > 0) {
-          transaction.update(reservationRef, {
-            'pending': currentPending - 1,
-          });
-        } else if (currentConfirmed > 0) {
-          transaction.update(reservationRef, {
-            'confirmed': currentConfirmed - 1,
-          });
-        }
+      if (userReservationStatus == 0 && currentPending > 0) {
+        await reservationRef.update({
+          'pending': currentPending - 1,
+        });
+        currentPending -= 1;
+      } else if (userReservationStatus == 1 && currentConfirmed > 0) {
+        await reservationRef.update({
+          'confirmed': currentConfirmed - 1,
+        });
+        currentConfirmed -= 1;
+      }
 
-        transaction.update(userReservationSnapshot.docs.first.reference, {
-          'status': 2, // Cancelado
+      await userReservationDoc.reference.update({
+        'status': 2, // Cancelado
+      });
+
+      QuerySnapshot pendingReservations = await _firestore
+          .collection('user_reservations')
+          .where('reservation_id', isEqualTo: reservationId)
+          .where('status', isEqualTo: 0) // Solo pendientes
+          .orderBy('created_date')
+          .limit(1)
+          .get();
+
+      if (pendingReservations.docs.isNotEmpty) {
+        DocumentReference firstPendingReservationRef =
+            pendingReservations.docs.first.reference;
+
+        await firstPendingReservationRef.update({
+          'status': 1, // Confirmado
         });
 
-        QuerySnapshot pendingReservations = await _firestore
-            .collection('user_reservations')
-            .where('reservation_id', isEqualTo: reservationId)
-            .where('status', isEqualTo: 0)
-            .orderBy('created_date')
-            .limit(1)
-            .get();
+        await reservationRef.update({
+          'pending': currentPending - 1,
+          'confirmed': currentConfirmed + 1,
+        });
 
-        if (pendingReservations.docs.isNotEmpty) {
-          DocumentReference firstPendingReservationRef =
-              pendingReservations.docs.first.reference;
-
-          transaction.update(firstPendingReservationRef, {
-            'status': 1, // Confirmado
-          });
-
-          DocumentReference reservationRefToUpdate =
-              _firestore.collection('reservations').doc(reservationId);
-
-          transaction.update(reservationRefToUpdate, {
-            'pending': currentPending - 1,
-            'confirmed': currentConfirmed + 1,
-          });
-        }
-      });
+        String confirmedUserId = pendingReservations.docs.first['user_id'];
+        await _notificationsService.createNotificationForUser(
+            confirmedUserId,
+            'Reserva Confirmada',
+            'Tu reserva ha sido confirmada debido a una cancelación de otro usuario.');
+      }
     } catch (e) {
-      throw Exception('No se pudo cancelar la reserva. Intente nuevamente.');
+      throw Exception('No se pudo cancelar la reserva. Intente nuevamente. $e');
     }
   }
 
@@ -379,25 +395,23 @@ class ReservationsService {
           .get();
 
       if (!userDoc.exists) {
-        return null; // El usuario no existe
+        return null;
       }
 
-      // Obtén la última reserva confirmada del usuario
       final userReservationsSnapshot = await _firestore
           .collection('user_reservations')
           .where('user_id', isEqualTo: qrCode)
           .where('status', isEqualTo: 1) // Confirmada
-          .orderBy('created_date', descending: true) // La más reciente
+          .orderBy('created_date', descending: true)
           .limit(1)
           .get();
 
       if (userReservationsSnapshot.docs.isEmpty) {
-        return null; // No hay reservas confirmadas
+        return null;
       }
       final userReservationDoc = userReservationsSnapshot.docs.first;
       final reservationId = userReservationDoc['reservation_id'];
 
-      // Obtén la reserva por su ID
       final reservationDoc =
           await _firestore.collection('reservations').doc(reservationId).get();
 
@@ -407,7 +421,7 @@ class ReservationsService {
           reservationDoc.data()!,
         );
       } else {
-        return null; // La
+        return null;
       }
     } catch (e) {
       return null;

@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_gimnasio_esquel/services/notifications_service.dart';
@@ -38,6 +36,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  Future<void> _deleteNotification(String notificationId) async {
+    try {
+      await _notificationsService.deleteNotification(notificationId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notificación eliminada')),
+      );
+      _loadNotifications();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al eliminar la notificación: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,14 +67,50 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: ListTile(
                     title: Text(notification['title']),
                     subtitle: Text(notification['message']),
-                    trailing: Text(
-                      notification['timestamp'] != null
-                          ? (notification['timestamp'] as Timestamp)
-                              .toDate()
-                              .toLocal()
-                              .toString()
-                          : '',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          notification['timestamp'] != null
+                              ? (notification['timestamp'] as Timestamp)
+                                  .toDate()
+                                  .toLocal()
+                                  .toString()
+                              : '',
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Eliminar notificación'),
+                                  content: const Text(
+                                      '¿Estás seguro de que deseas eliminar esta notificación?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Cancelar'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('Eliminar'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        _deleteNotification(notification['id']);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 );

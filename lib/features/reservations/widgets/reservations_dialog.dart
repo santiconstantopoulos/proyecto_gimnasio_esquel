@@ -16,10 +16,12 @@ class ReservationDialogState extends State<ReservationDialog> {
   final _timeController = TextEditingController();
   final _durationController = TextEditingController();
   final _placesController = TextEditingController();
+  final _classNameController = TextEditingController();
   DateTime? _selectedStartDate;
 
   @override
   void dispose() {
+    _classNameController.dispose();
     _dateController.dispose();
     _timeController.dispose();
     _durationController.dispose();
@@ -76,14 +78,15 @@ class ReservationDialogState extends State<ReservationDialog> {
           instructorId: 'instructorId',
           places: int.tryParse(_placesController.text) ?? 1,
           confirmed: 0,
-          pending: 0, 
-          className: '',
+          pending: 0,
+          className: _classNameController.text,
         );
         Navigator.of(context).pop(reservation);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Por favor, selecciona una fecha y hora válidas')),
+            content: Text('Por favor, selecciona una fecha y hora válidas'),
+          ),
         );
       }
     }
@@ -98,6 +101,19 @@ class ReservationDialogState extends State<ReservationDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            TextFormField(
+              controller: _classNameController,
+              decoration: const InputDecoration(
+                labelText: 'Nombre de la Clase',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingresa el nombre de la clase';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
             TextFormField(
               controller: _dateController,
               decoration: InputDecoration(
