@@ -1,1 +1,0 @@
-// La seccion mas para la parte mobile debería ser un drawer en el inicio?

@@ -27,7 +27,6 @@ class _CreditsScreenState extends State<CreditsScreen> {
     _loadUsers();
   }
 
-  // Carga los usuarios
   Future<void> _loadUsers() async {
     try {
       final users = await _usersService.getUsers();
@@ -43,7 +42,6 @@ class _CreditsScreenState extends State<CreditsScreen> {
     }
   }
 
-  // Filtrar usuarios por nombre
   void _filterUsers(String query) {
     final filtered = _allUsers.where((user) {
       final name = user.name.toLowerCase();
@@ -55,7 +53,6 @@ class _CreditsScreenState extends State<CreditsScreen> {
     });
   }
 
-  // Agregar créditos
   void _addCreditsToUser(User user, int credits) async {
     try {
       await _creditsService.addCreditsToUser(user.id, credits);

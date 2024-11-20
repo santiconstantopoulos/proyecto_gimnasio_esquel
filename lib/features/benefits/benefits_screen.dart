@@ -3,7 +3,7 @@ import 'package:proyecto_gimnasio_esquel/models/benefit.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/services/benefits_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/benefits/widgets/benefits_card.dart';
-import 'package:proyecto_gimnasio_esquel/features/benefits/widgets/benefits_dialog.dart'; // Importa el widget para agregar beneficios
+import 'package:proyecto_gimnasio_esquel/features/benefits/widgets/benefits_dialog.dart';
 
 class BenefitsScreen extends StatefulWidget {
   const BenefitsScreen({super.key});
@@ -42,7 +42,6 @@ class _BenefitsScreenState extends State<BenefitsScreen> {
     }
   }
 
-  // Muestra el diálogo para agregar un nuevo beneficio
   Future<void> _showAddBenefitDialog() async {
     final newBenefit = await showDialog<Benefit>(
       context: context,
@@ -54,7 +53,7 @@ class _BenefitsScreenState extends State<BenefitsScreen> {
     if (newBenefit != null) {
       try {
         await _benefitsService.addBenefit(newBenefit);
-        _loadBenefits(); // Recarga la lista de beneficios
+        _loadBenefits();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Beneficio agregado')),
         );
@@ -81,7 +80,6 @@ class _BenefitsScreenState extends State<BenefitsScreen> {
   Widget _buildAdminBenefits() {
     return Column(
       children: [
-        // Botón para agregar un nuevo beneficio
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(

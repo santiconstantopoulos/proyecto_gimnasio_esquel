@@ -51,7 +51,6 @@ class UsersList extends StatelessWidget {
     );
   }
 
-  // Diálogo de agregar créditos
   void _showAddCreditsDialog(BuildContext context, User user) {
     showDialog(
       context: context,

@@ -74,7 +74,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 children: [
                   CircleAvatar(
                     backgroundImage:
-                        NetworkImage(profileImageUrl), // Imagen predeterminada
+                        NetworkImage(profileImageUrl),
                     radius: 30,
                   ),
                   const SizedBox(width: 16),
@@ -124,7 +124,6 @@ class _MenuScreenState extends State<MenuScreen> {
                   leading: const Icon(Icons.logout),
                   title: const Text(AppStrings.logoutMessage),
                   onTap: () {
-                    // Muestra un diálogo de confirmación
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -135,15 +134,13 @@ class _MenuScreenState extends State<MenuScreen> {
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context)
-                                    .pop(); // Cierra el diálogo
+                                    .pop();
                               },
                               child: const Text('Cancelar'),
                             ),
                             TextButton(
                               onPressed: () async {
-                                // Llama a signOut desde AuthGate
                                 await _authService.signOut();
-                                // Después de cerrar sesión, vuelve a AuthGate
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(

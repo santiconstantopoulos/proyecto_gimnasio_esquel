@@ -6,7 +6,6 @@ class LogService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _authService = AuthService();
 
-  // Crea un log de un usuario
   Future<void> createUserLog(String message, String type, String origin) async {
     try {
       DateTime now = DateTime.now();

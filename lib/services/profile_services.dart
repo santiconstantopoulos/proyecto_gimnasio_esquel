@@ -8,7 +8,6 @@ class ProfileService {
   final AuthService _authService = AuthService();
   final LogService _logService = LogService();
 
-  // Obtiene la información de perfil, si no existe crea una por defecto
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile() async {
     try {
       String userId = _authService.userId;
@@ -45,7 +44,6 @@ class ProfileService {
     }
   }
 
-  // Actualiza el nombre de usuario
   Future<void> updateUserName(String newName) async {
     try {
       String userId = _authService.userId;
@@ -69,7 +67,6 @@ class ProfileService {
     }
   }
 
-  // Actualiza la imagen de perfil
   Future<void> updateUserProfileImage(String imageUrl) async {
     try {
       String userId = _authService.userId;

@@ -7,7 +7,6 @@ class CreditsService {
   final AuthService _authService = AuthService();
   final LogService _logService = LogService();
 
-  // Obtiene los créditos del usuario logeado, si no existe el documento lo crea
   Stream<int> getUserCredits() async* {
     String userId = _authService.userId;
     DocumentReference<Map<String, dynamic>> creditsDoc = _firestore
@@ -33,7 +32,6 @@ class CreditsService {
     });
   }
 
-  // Consume créditos del usuario logueado
   Future<void> consumeCredits(int creditsToConsume) async {
     try {
       String userId = _authService.userId;
@@ -74,7 +72,6 @@ class CreditsService {
     }
   }
 
-  // Consume créditos de un usuario específico
   Future<void> consumeCreditsForUser(
       String userId, int creditsToConsume) async {
     try {
@@ -116,7 +113,6 @@ class CreditsService {
     }
   }
 
-  // Retorna créditos al usuario logueado
   Future<void> returnCredits(int creditsToReturn) async {
     try {
       String userId = _authService.userId;
@@ -153,7 +149,6 @@ class CreditsService {
     }
   }
 
-  // Agrega créditos a un usuario (admin)
   Future<void> addCreditsToUser(String userId, int creditsToAdd) async {
     try {
       DocumentReference docRef = _firestore

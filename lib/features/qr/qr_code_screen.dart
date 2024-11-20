@@ -72,9 +72,8 @@ class _QrCodeScreen extends State<QrCodeScreen> {
 
   Future<void> _handleQRScan() async {
     try {
-      // Si tiene una reserva para hoy, resta un crédito
       if (hasReservationToday) {
-        await _creditsService.consumeCredits(1); // Consume un crédito
+        await _creditsService.consumeCredits(1);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Crédito restado')),
         );
@@ -95,16 +94,12 @@ class _QrCodeScreen extends State<QrCodeScreen> {
       final scannedCode = await qrViewController!.scannedDataStream.first;
       scannedQrCode = scannedCode.code;
 
-      // Busca la reserva del usuario
       final reservation =
           await _reservationsService.getReservationByQrCode(scannedQrCode!);
 
-      // Verifica si la reserva es válida (del día de hoy y no está consumida)
       if (reservation != null &&
           DateTime.now().day == reservation.fromDate.toDate().day) {
-        // Resta un crédito al usuario
-        await _creditsService
-            .consumeCredits(1); // TODO: restar creditos al usuario
+        await _creditsService.consumeCredits(1);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Crédito restado')),
         );
@@ -120,10 +115,6 @@ class _QrCodeScreen extends State<QrCodeScreen> {
     } finally {
       qrViewController!.pauseCamera();
     }
-  }
-
-  void test() {
-    print("asd");
   }
 
   @override
@@ -142,7 +133,6 @@ class _QrCodeScreen extends State<QrCodeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Mostrar el QR si el usuario tiene una reserva para hoy
             if (hasReservationToday)
               QrImageView(
                 data: currentUser!.qrCode,
@@ -152,13 +142,11 @@ class _QrCodeScreen extends State<QrCodeScreen> {
             else
               const Text('No tienes una reserva para hoy'),
 
-            // Botón para escanear el QR
             ElevatedButton(
               onPressed: hasReservationToday ? _handleQRScan : null,
               child: const Text('Escanear QR'),
             ),
 
-            // Seccion para escanear QR si es administrador
             if (isAdmin)
               Expanded(
                 child: QRView(
@@ -180,7 +168,13 @@ class _QrCodeScreen extends State<QrCodeScreen> {
 
             if (isAdmin)
               ElevatedButton(
-                onPressed: scannedQrCode?.isNotEmpty == true ? _scanQR : test,
+                onPressed: () {
+                  scannedQrCode?.isNotEmpty == true
+                      ? _scanQR()
+                      : ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Crédito restado')),
+                        );
+                },
                 child: const Text('Escanear QR de Usuario'),
               ),
           ],

@@ -11,7 +11,6 @@ class User {
     required this.qrCode,
   });
 
-  // Factory para crear un User desde Firestore
   factory User.fromFirestore(String id, Map<String, dynamic> data) {
     return User(
       id: id,

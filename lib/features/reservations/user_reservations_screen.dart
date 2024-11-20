@@ -20,7 +20,6 @@ class _UserReservationsScreenState extends State<UserReservationsScreen> {
 
   bool _showCalendar = false;
 
-  // Handler para agendar una reserva
   void _handleScheduleUserReservation(Reservation reservation) async {
     try {
       await _reservationsService.scheduleUserReservation(reservation.id);
@@ -34,7 +33,6 @@ class _UserReservationsScreenState extends State<UserReservationsScreen> {
     }
   }
 
-  // Handler para cancelar una reserva
   void _handleCancelUserReservation(Reservation reservation) async {
     try {
       await _reservationsService.cancelUserReservation(reservation.id);
@@ -48,7 +46,6 @@ class _UserReservationsScreenState extends State<UserReservationsScreen> {
     }
   }
 
-  // Maneja la opcion del popup seleccionada
   void _handleUserReservationsOption(String value, Reservation reservation) {
     if (value == 'schedule') {
       _handleScheduleUserReservation(reservation);

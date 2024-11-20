@@ -19,7 +19,6 @@ class BenefitCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen del beneficio
           Image.network(
             benefit.imageUrl,
             height: 150,
@@ -30,7 +29,6 @@ class BenefitCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Título del beneficio
                 Text(
                   benefit.title,
                   style: const TextStyle(
@@ -39,13 +37,11 @@ class BenefitCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Descripción del beneficio
                 Text(
                   benefit.description,
                   style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 8),
-                // Descuento del beneficio
                 Text(
                   '${benefit.discount}% de descuento',
                   style: const TextStyle(
@@ -53,7 +49,6 @@ class BenefitCard extends StatelessWidget {
                     color: Colors.green,
                   ),
                 ),
-                // Información de pago (opcional)
                 if (benefit.paymentInformation != null)
                   const SizedBox(height: 8),
                 if (benefit.paymentInformation != null)
@@ -61,7 +56,6 @@ class BenefitCard extends StatelessWidget {
                     benefit.paymentInformation!,
                     style: const TextStyle(fontSize: 12),
                   ),
-                // Opciones de edición y eliminación (solo para admin)
                 if (onEdit != null || onDelete != null)
                   const SizedBox(height: 8),
                 if (onEdit != null || onDelete != null)

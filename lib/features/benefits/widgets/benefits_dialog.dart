@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/models/benefit.dart';
-import 'package:image_picker/image_picker.dart'; // Importa el paquete para seleccionar imágenes
-import 'dart:io'; // Importa para manejar archivos
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AddBenefitDialog extends StatefulWidget {
   const AddBenefitDialog({Key? key}) : super(key: key);
@@ -18,7 +18,6 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
   final _paymentInformationController = TextEditingController();
   File? _selectedImage;
 
-  // Selecciona una imagen de la galería
   Future<void> _selectImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -48,7 +47,6 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Título del beneficio
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Título'),
@@ -60,7 +58,6 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
                 },
               ),
               const SizedBox(height: 16),
-              // Descripción del beneficio
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(labelText: 'Descripción'),
@@ -72,7 +69,6 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
                 },
               ),
               const SizedBox(height: 16),
-              // Imagen del beneficio
               Row(
                 children: [
                   Expanded(
@@ -87,7 +83,6 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
                 ],
               ),
               const SizedBox(height: 16),
-              // Descuento del beneficio
               TextFormField(
                 controller: _discountController,
                 decoration: const InputDecoration(labelText: 'Descuento (%)'),
@@ -103,7 +98,6 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
                 },
               ),
               const SizedBox(height: 16),
-              // Información de pago (opcional)
               TextFormField(
                 controller: _paymentInformationController,
                 decoration:
@@ -126,13 +120,12 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
         TextButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              // Crea el objeto Benefit
               final newBenefit = Benefit(
-                id: '', // El ID se genera automáticamente en la base de datos
+                id: '',
                 title: _titleController.text,
                 description: _descriptionController.text,
                 imageUrl: _selectedImage != null
-                    ? 'https://www.google.com' // Reemplaza con la URL de la imagen subida
+                    ? 'https://www.google.com'
                     : '',
                 discount: int.parse(_discountController.text),
                 paymentInformation:
@@ -140,8 +133,6 @@ class _AddBenefitDialogState extends State<AddBenefitDialog> {
                         ? _paymentInformationController.text
                         : null,
               );
-
-              // Guarda el beneficio en la base de datos
               Navigator.of(context).pop(newBenefit);
             }
           },

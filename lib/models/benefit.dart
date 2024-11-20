@@ -1,10 +1,10 @@
 class Benefit {
-  final String id; // ID del beneficio
-  final String title; // Título del beneficio
-  final String description; // Descripción del beneficio
-  final String imageUrl; // URL de la imagen del beneficio
-  final int discount; // Descuento del beneficio
-  final String? paymentInformation; // Información de pago (opcional)
+  final String id;
+  final String title;
+  final String description;
+  final String imageUrl;
+  final int discount;
+  final String? paymentInformation;
 
   Benefit({
     required this.id,

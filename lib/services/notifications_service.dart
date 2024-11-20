@@ -7,7 +7,6 @@ class NotificationsService {
   final AuthService _authService = AuthService();
   final LogService _logService = LogService();
 
-  // Obtiene las notificaciones del usuario
   Future<List<Map<String, dynamic>>> getNotifications() async {
     try {
       String userId = _authService.userId;
@@ -34,7 +33,6 @@ class NotificationsService {
     }
   }
 
-  // Crea una notificación para el usuario logeado
   Future<void> createNotification(String title, String message) async {
     try {
       await _firestore
@@ -58,7 +56,6 @@ class NotificationsService {
     }
   }
 
-  // Crea una notificación para un usuario específico
   Future<void> createNotificationForUser(
       String userId, String title, String message) async {
     try {
@@ -86,7 +83,6 @@ class NotificationsService {
     }
   }
 
-  //Elimina un notificación
   Future<void> deleteNotification(String notificationId) async {
     try {
       String userId = _authService.userId;

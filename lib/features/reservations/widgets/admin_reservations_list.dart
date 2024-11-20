@@ -33,7 +33,7 @@ class AdminReservationsList extends StatelessWidget {
                     .format(reservation.toDate.toDate().toLocal());
 
                 return ListTile(
-                  title: Text('Reserva de ${reservation.instructorId}'),
+                  title: Text('Reserva de ${reservation.className}'),
                   subtitle: Text(
                     'Desde: $fromDateFormatted - Hasta: $toDateFormatted\n'
                     'Lugares: ${reservation.places} - Ocupados: ${reservation.confirmed} - Pendientes: ${reservation.pending}',

@@ -6,7 +6,6 @@ class UsersService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final LogService _logService = LogService();
 
-  // Obtiene la lista de usuarios con su perfil
   Future<List<User>> getUsers() async {
     try {
       final usersSnapshot = await _firestore.collection('users').get();

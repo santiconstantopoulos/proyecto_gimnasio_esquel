@@ -14,7 +14,6 @@ class ReservationsService {
   final LogService _logService = LogService();
   final NotificationsService _notificationsService = NotificationsService();
 
-  // Obtiene todas las reservas
   Stream<List<Reservation>> getReservations() {
     return _firestore
         .collection('reservations')
@@ -27,7 +26,6 @@ class ReservationsService {
     });
   }
 
-  // Obtiene a los participantes de una reserva
   Stream<List<Participant>> getParticipants(String reservationId) async* {
     try {
       final userReservationsSnapshot = await _firestore
@@ -65,7 +63,6 @@ class ReservationsService {
     }
   }
 
-  // El admin crea una reserva
   Future<void> createReservation(
     Timestamp fromDate,
     Timestamp toDate,
@@ -100,7 +97,6 @@ class ReservationsService {
     }
   }
 
-  // El admin elimina una reserva
   Future<void> deleteReservation(String reservationId) async {
     try {
       await _firestore
@@ -121,7 +117,6 @@ class ReservationsService {
     }
   }
 
-  // Obtiene las reservas del usuario (user_reservations)
   Stream<List<UserReservation>> getUserReservations() {
     return _firestore
         .collection('user_reservations')
@@ -184,7 +179,6 @@ class ReservationsService {
         });
   }
 
-  // El usuario se agenda a una reserva
   Future<void> scheduleUserReservation(String reservationId) async {
     try {
       DocumentReference reservationRef =
@@ -250,7 +244,6 @@ class ReservationsService {
     }
   }
 
-  // Obtiene el estado de la reserva del usuario
   Future<int?> getUserReservationStatus(String reservationId) async {
     final QuerySnapshot snapshot = await _firestore
         .collection('user_reservations')
@@ -265,7 +258,6 @@ class ReservationsService {
     return null;
   }
 
-  // El admin confirma una reserva de un usuario
   Future<void> confirmUserReservation(UserReservation reservation) async {
     try {
       DocumentReference userReservationRef =
@@ -302,7 +294,6 @@ class ReservationsService {
     }
   }
 
-  // El usuario cancela su reserva
   Future<void> cancelUserReservation(String reservationId) async {
     try {
       DocumentReference reservationRef =
@@ -382,7 +373,6 @@ class ReservationsService {
     }
   }
 
-  // Obtiene la reserva de un usuario por su código QR
   Future<Reservation?> getReservationByQrCode(String qrCode) async {
     try {
       // Obtén la información del usuario a partir del código QR
