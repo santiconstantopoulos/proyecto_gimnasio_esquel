@@ -74,6 +74,48 @@ class CreditsService {
     }
   }
 
+  // Consume créditos de un usuario específico
+  Future<void> consumeCreditsForUser(
+      String userId, int creditsToConsume) async {
+    try {
+      DocumentReference docRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('credits')
+          .doc('available_credits');
+
+      DocumentSnapshot snapshot = await docRef.get();
+      if (!snapshot.exists) {
+        throw Exception(
+            'No se encontraron créditos disponibles para este usuario');
+      }
+
+      final data = snapshot.data() as Map<String, dynamic>;
+      final currentCredits = data['credit'] ?? 0;
+
+      if (currentCredits < creditsToConsume) {
+        throw Exception('El usuario no tiene suficientes créditos');
+      }
+
+      await docRef.update({
+        'credit': currentCredits - creditsToConsume,
+      });
+
+      await _logService.createUserLog(
+        'Créditos consumidos para el usuario $userId: $creditsToConsume',
+        'info',
+        'credits_service',
+      );
+    } catch (e) {
+      await _logService.createUserLog(
+        'Error al consumir créditos para el usuario $userId: $e',
+        'error',
+        'credits_service',
+      );
+      throw Exception('Error al consumir créditos para el usuario: $e');
+    }
+  }
+
   // Retorna créditos al usuario logueado
   Future<void> returnCredits(int creditsToReturn) async {
     try {

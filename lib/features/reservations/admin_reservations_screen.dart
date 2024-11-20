@@ -36,7 +36,6 @@ class _AdminReservationsScreenState extends State<AdminReservationsScreen> {
           instructorId: newReservation.instructorId,
           confirmed: 0,
           pending: 0,
-          occupiedPlaces: 0,
           status: 0,
         );
         ScaffoldMessenger.of(context).showSnackBar(

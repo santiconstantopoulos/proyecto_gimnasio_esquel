@@ -69,7 +69,7 @@ class UserReservationsList extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Reserva de ${reservation.instructorId}',
+                                  reservation.className,
                                 ),
                                 Text(
                                   'Desde: $fromDateFormatted - Hasta: $toDateFormatted\n'
