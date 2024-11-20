@@ -23,8 +23,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isAdmin = false;
   bool _loading = true;
 
-  final Icon _qrIcon = const Icon(Icons.qr_code,
-      size: 30, color: Color.fromARGB(255, 255, 187, 0));
+  // Eliminamos _qrIcon, ya que no es necesario aquí.
 
   @override
   void initState() {
@@ -54,21 +53,27 @@ class _HomeScreenState extends State<HomeScreen>
     const QrCodeScreen(),
     const NotificationsScreen(),
     const CreditsScreen(),
+    const BenefitsScreen(),
     const MenuScreen(),
   ];
 
-  // Íconos para usuarios normales y administradores (solo un listado ahora)
-  final List<Widget> _icons = const <Widget>[
+  final List<Widget> _userIcons = const <Widget>[
     Icon(Icons.home, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-    Icon(Icons.qr_code,
-        size: 30, color: Color.fromARGB(255, 255, 187, 0)), //  icono QR
-    Icon(Icons.notifications,
-        size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-    Icon(Icons.money,
-        size: 30,
-        color: Color.fromARGB(255, 255, 187, 0)), //  icono de créditos
+    Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.notifications, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.wallet, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.menu, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
   ];
+
+  final List<Widget> _adminIcons = const <Widget>[
+    Icon(Icons.home, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.notifications, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.money, size: 30, color: Color.fromARGB(255, 255, 187, 0)), // Icono para Créditos
+    Icon(Icons.wallet, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.menu, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,29 +84,18 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     return Scaffold(
-      body: _isAdmin
-          ? _adminScreens[_selectedIndex]
-          : _userScreens[_selectedIndex],
+      body: _isAdmin ? _adminScreens[_selectedIndex] : _userScreens[_selectedIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _selectedIndex,
         height: 50,
-        items: _icons,
+        items: _isAdmin ? _adminIcons : _userIcons, // Seleccionamos la lista correcta de iconos
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
-            // Si se selecciona el botón QR, navega a GenerateQRPage solo si está habilitado
-            if (index == 1 && _qrIcon.icon == Icons.qr_code) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const QrCodeScreen(),
-                ),
-              );
-            }
           });
         },
         color: const Color.fromARGB(255, 54, 32, 68),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 221, 213, 213),
         animationDuration: const Duration(milliseconds: 300),
         animationCurve: Curves.easeInOut,
       ),

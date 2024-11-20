@@ -42,6 +42,8 @@ class AppStrings {
   static const String newBenefitNotificationTitle = 'Nuevo beneficio';
   static const String newBenefitNotificationBody = '20% off en proteínas';
   static const String beneficios = 'Beneficios';
+  static const String qrCode = 'Escanear Codigo QR';
+  static const String notifications = 'Notificaciones';
 
   // Otros
   static const String confirm = 'Confirmar';

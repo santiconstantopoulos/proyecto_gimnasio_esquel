@@ -61,7 +61,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'proyecto-esquel-gimnasio.appspot.com',
     androidClientId: '1092870181448-u2cv8uca9m7sjbtl3o9df2jqhhcv61tc.apps.googleusercontent.com',
     iosClientId: '1092870181448-chdps3n2kp4sgdkap57c891m9q51jku5.apps.googleusercontent.com',
-    iosBundleId: 'com.example.proyectoGimnacioEsquel',
+    iosBundleId: 'com.example.proyectoGimnasioEsquel',
   );
 
   static const FirebaseOptions web = FirebaseOptions(

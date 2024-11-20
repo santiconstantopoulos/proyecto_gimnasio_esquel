@@ -4,7 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
+import 'package:proyecto_gimnasio_esquel/features/benefits/benefits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/login/auth_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
+import 'package:proyecto_gimnasio_esquel/features/qr/qr_code_screen.dart';
 import 'package:proyecto_gimnasio_esquel/services/auth_service.dart';
 import 'package:proyecto_gimnasio_esquel/features/profile/profile_screen.dart';
 import 'package:proyecto_gimnasio_esquel/services/profile_services.dart';
@@ -73,8 +76,7 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage:
-                        NetworkImage(profileImageUrl),
+                    backgroundImage: NetworkImage(profileImageUrl),
                     radius: 30,
                   ),
                   const SizedBox(width: 16),
@@ -116,10 +118,45 @@ class _MenuScreenState extends State<MenuScreen> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
           ),
-          // Resto de las opciones del menú
           Expanded(
             child: ListView(
               children: [
+                ListTile(
+                  leading: const Icon(Icons.qr_code),
+                  title: const Text(AppStrings.qrCode),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const QrCodeScreen(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.notifications),
+                  title: const Text(AppStrings.notifications),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationsScreen(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.wallet),
+                  title: const Text(AppStrings.beneficios),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BenefitsScreen(),
+                      ),
+                    );
+                  },
+                ),
                 ListTile(
                   leading: const Icon(Icons.logout),
                   title: const Text(AppStrings.logoutMessage),
@@ -133,8 +170,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context)
-                                    .pop();
+                                Navigator.of(context).pop();
                               },
                               child: const Text('Cancelar'),
                             ),

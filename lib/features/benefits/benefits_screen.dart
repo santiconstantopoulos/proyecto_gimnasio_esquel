@@ -35,7 +35,6 @@ class _BenefitsScreenState extends State<BenefitsScreen> {
       benefits = await _benefitsService.getBenefits();
       setState(() {});
     } catch (e) {
-      print('Error al cargar los beneficios: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar los beneficios: $e')),
       );
