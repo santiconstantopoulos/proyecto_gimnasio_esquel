@@ -16,13 +16,22 @@ class BenefitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(
-            benefit.imageUrl,
-            height: 150,
-            fit: BoxFit.cover,
+          Flexible(
+            child: Image.network(
+              benefit.imageUrl,
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(child: CircularProgressIndicator());
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(child: Icon(Icons.error));
+              },
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -60,6 +69,7 @@ class BenefitCard extends StatelessWidget {
                   const SizedBox(height: 8),
                 if (onEdit != null || onDelete != null)
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       if (onEdit != null)
                         IconButton(
