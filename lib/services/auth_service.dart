@@ -9,6 +9,29 @@ class AuthService {
 
   String get userId => currentUser?.uid ?? 'unknown_user';
 
+  // Crear un documento en la colección 'users'
+  Future<void> createUserDocument() async {
+    try {
+      final User? user = _firebaseAuth.currentUser;
+
+      if (user != null) {
+        final docRef = _firestore.collection('users').doc(user.uid);
+
+        final docSnapshot = await docRef.get();
+
+        if (docSnapshot.exists) {
+        } else {
+          await docRef.set({
+            'rol': 'user',
+          });
+        }
+      } else {}
+    } catch (e) {
+      throw Exception(
+          'Error al crear/verificar el documento en la colección users: $e');
+    }
+  }
+
   Future<int> _getUserType() async {
     try {
       DocumentReference docRef = _firestore.collection('users').doc(userId);

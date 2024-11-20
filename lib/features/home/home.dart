@@ -1,6 +1,5 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:proyecto_gimnasio_esquel/features/app_strings.dart';
 import 'package:proyecto_gimnasio_esquel/features/benefits/benefits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/credits/credits_screen.dart';
 import 'package:proyecto_gimnasio_esquel/features/notifications/notifications_screen.dart';
@@ -23,8 +22,6 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isAdmin = false;
   bool _loading = true;
 
-  // Eliminamos _qrIcon, ya que no es necesario aquí.
-
   @override
   void initState() {
     super.initState();
@@ -33,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> _checkAdminStatus() async {
     AuthService authService = AuthService();
+    await authService.createUserDocument();
     bool isAdmin = await authService.isAdmin;
     setState(() {
       _isAdmin = isAdmin;
@@ -60,7 +58,8 @@ class _HomeScreenState extends State<HomeScreen>
   final List<Widget> _userIcons = const <Widget>[
     Icon(Icons.home, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-    Icon(Icons.notifications, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.notifications,
+        size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.wallet, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.menu, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
   ];
@@ -68,12 +67,14 @@ class _HomeScreenState extends State<HomeScreen>
   final List<Widget> _adminIcons = const <Widget>[
     Icon(Icons.home, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.qr_code, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-    Icon(Icons.notifications, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
-    Icon(Icons.money, size: 30, color: Color.fromARGB(255, 255, 187, 0)), // Icono para Créditos
+    Icon(Icons.notifications,
+        size: 30, color: Color.fromARGB(255, 255, 187, 0)),
+    Icon(Icons.money,
+        size: 30,
+        color: Color.fromARGB(255, 255, 187, 0)), // Icono para Créditos
     Icon(Icons.wallet, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
     Icon(Icons.menu, size: 30, color: Color.fromARGB(255, 255, 187, 0)),
   ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +85,15 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     return Scaffold(
-      body: _isAdmin ? _adminScreens[_selectedIndex] : _userScreens[_selectedIndex],
+      body: _isAdmin
+          ? _adminScreens[_selectedIndex]
+          : _userScreens[_selectedIndex],
       bottomNavigationBar: CurvedNavigationBar(
         index: _selectedIndex,
         height: 50,
-        items: _isAdmin ? _adminIcons : _userIcons, // Seleccionamos la lista correcta de iconos
+        items: _isAdmin
+            ? _adminIcons
+            : _userIcons, // Seleccionamos la lista correcta de iconos
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
